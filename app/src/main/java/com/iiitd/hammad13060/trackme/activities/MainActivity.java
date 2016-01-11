@@ -1,6 +1,10 @@
 package com.iiitd.hammad13060.trackme.activities;
 
+
 import android.content.Intent;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -23,6 +27,8 @@ import android.view.MenuItem;
 import com.iiitd.hammad13060.trackme.Fragments.OneFragment;
 import com.iiitd.hammad13060.trackme.Fragments.TwoFragment;
 import com.iiitd.hammad13060.trackme.R;
+import com.iiitd.hammad13060.trackme.helpers.Authentication;
+import com.iiitd.hammad13060.trackme.helpers.Constants;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,6 +39,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (!Authentication.hasAccess(getApplicationContext()))
+            enterRegistrationActivity();
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -114,5 +124,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void enterRegistrationActivity() {
+        Intent intent = new Intent(this, RegistrationActivity.class);
+        intent.putExtra(RegistrationActivity.EXTRA_UI_STATE, false);
+        startActivity(intent);
+        finish();
     }
 }
