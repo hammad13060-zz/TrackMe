@@ -25,6 +25,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
     compile 'com.mcxiaoke.volley:library-aar:1.0.0'
-    compile files('/home/hammad/development/workspace/android-projects/TrackMe2/libs/sinch-android-verification-1.1.1.jar')
-    compile files('/home/hammad/development/workspace/android-projects/TrackMe/libs/sinch-android-verification-1.1.1.jar')
+    compile files('C:/Users/Pushkin/Desktop/TrackMe/libs/sinch-android-verification-1.1.1.jar')
 }
