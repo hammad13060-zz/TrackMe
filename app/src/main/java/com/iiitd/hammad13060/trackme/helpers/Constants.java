@@ -4,8 +4,7 @@ package com.iiitd.hammad13060.trackme.helpers;
  * Created by hammad on 16/12/15.
  */
 public class Constants {
-    public static final String SERVER_URL = "example.com";
-    public static final String PROCESSING_URL = SERVER_URL + "/";
+    public static final String SERVER_URL = "http://10.0.0.10:8080/";
 
     public static final String EXTRA_CONTACT_NUMBER = "com.iiitd.hammad13060.trackme.EXTRA_CONTACT_NUMBER";
 

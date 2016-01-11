@@ -5,9 +5,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONObject;
 
-/**
- * Created by Hammad on 19-10-2015.
- */
 public class JSONRequest extends JsonObjectRequest{
 
     private JSONObject object = null;

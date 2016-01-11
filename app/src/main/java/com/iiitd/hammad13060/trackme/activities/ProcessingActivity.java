@@ -34,7 +34,7 @@ import org.json.JSONObject;
 
 public class ProcessingActivity extends AppCompatActivity {
     public static final String TAG = "ProcessingActivity";
-    private static final String WEB_URL = Constants.SERVER_URL+ "/";
+    private static final String WEB_URL = Constants.SERVER_URL+ "registration/";
 
 
     private String contact_number = null;
@@ -49,7 +49,7 @@ public class ProcessingActivity extends AppCompatActivity {
     }
 
     private void verifyUser() {
-        Config config = SinchVerification.config().applicationKey(String.valueOf(R.string.sinch_app_key))
+        Config config = SinchVerification.config().applicationKey("82224d5f-b267-4c5b-9d73-27b895c29d10")
                 .context(getApplicationContext()).build();
         VerificationListener listener = initVerificationListener();
         String defaultRegion = PhoneNumberUtils.getDefaultCountryIso(this);
@@ -67,7 +67,7 @@ public class ProcessingActivity extends AppCompatActivity {
 
             @Override
             public void onInitiationFailed(Exception e) {
-                Log.d(TAG, "verification: onInitiationFailed() called");
+                Log.d(TAG, "onInitiationFailed(): " + e.toString());
                 Toast.makeText(getApplicationContext(), "verification failed !!! Try again.", Toast.LENGTH_LONG);
                 enterRegistrationActivity();
             }
@@ -109,17 +109,17 @@ public class ProcessingActivity extends AppCompatActivity {
 
     private void makePost(JSONObject requestObject) {
         RegisterUserTask registerUserTask = new RegisterUserTask();
-        registerUserTask.doInBackground(requestObject);
+        registerUserTask.execute(requestObject);
     }
 
 
-    private class RegisterUserTask extends AsyncTask<JSONObject, JSONObject, JSONObject> {
+    private class RegisterUserTask extends AsyncTask<JSONObject, Void, Void> {
 
         private Response.Listener<JSONObject> responseListener = null;
         private Response.ErrorListener errorListener = null;
         private RequestQueue requestQueue = null;
         @Override
-        protected JSONObject doInBackground(JSONObject... objects) {
+        protected Void doInBackground(JSONObject... objects) {
             initResponseListener();
             initErrorListener();
             requestQueue = Volley.newRequestQueue(getApplicationContext());
@@ -175,6 +175,7 @@ public class ProcessingActivity extends AppCompatActivity {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     requestQueue.stop();
+                    enterRegistrationActivity();
                 }
             };
         }
