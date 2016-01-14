@@ -24,7 +24,9 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.iiitd.hammad13060.trackme.Fragments.JourneyFragment;
 import com.iiitd.hammad13060.trackme.Fragments.OneFragment;
+import com.iiitd.hammad13060.trackme.Fragments.TrackFragment;
 import com.iiitd.hammad13060.trackme.Fragments.TwoFragment;
 import com.iiitd.hammad13060.trackme.R;
 import com.iiitd.hammad13060.trackme.helpers.Authentication;
@@ -35,6 +37,11 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
+
+    static final int SELECT_SOURCE_DESTINATION_REQUEST_CODE = 1;
+
+    private Fragment journeyFragment = null;
+    private Fragment trackFragment = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,15 +69,19 @@ public class MainActivity extends AppCompatActivity {
                 //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                    //     .setAction("Action", null).show();
                 Intent i = new Intent(MainActivity.this,SourceDestination.class);
-                startActivity(i);
+                startActivityForResult(i, SELECT_SOURCE_DESTINATION_REQUEST_CODE);
             }
         });
     }
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new OneFragment(), "ONE");
-        adapter.addFragment(new TwoFragment(), "TWO");
+
+        journeyFragment = new JourneyFragment();
+        trackFragment = new TrackFragment();
+
+        adapter.addFragment(journeyFragment, "Journey");
+        adapter.addFragment(trackFragment, "Track");
         viewPager.setAdapter(adapter);
     }
 
@@ -128,8 +139,24 @@ public class MainActivity extends AppCompatActivity {
 
     private void enterRegistrationActivity() {
         Intent intent = new Intent(this, RegistrationActivity.class);
-        intent.putExtra(RegistrationActivity.EXTRA_UI_STATE, false);
+        intent.putExtra(RegistrationActivity.EXTRA_UI_STATE, true);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == SELECT_SOURCE_DESTINATION_REQUEST_CODE) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                // The user picked a contact.
+                // The Intent's data Uri identifies which contact was selected.
+
+                // Do something with the contact here (bigger example below)
+            } else if (resultCode == RESULT_CANCELED) {
+
+            }
+        }
     }
 }

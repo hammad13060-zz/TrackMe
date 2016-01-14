@@ -68,7 +68,7 @@ public class ProcessingActivity extends AppCompatActivity {
             @Override
             public void onInitiationFailed(Exception e) {
                 Log.d(TAG, "onInitiationFailed(): " + e.toString());
-                Toast.makeText(getApplicationContext(), "verification failed !!! Try again.", Toast.LENGTH_LONG);
+                Constants.showLongToast(getApplicationContext(), "verification failed !!! Try again.");
                 enterRegistrationActivity();
             }
 
@@ -81,7 +81,7 @@ public class ProcessingActivity extends AppCompatActivity {
             @Override
             public void onVerificationFailed(Exception e) {
                 Log.d(TAG, "verification: onVerificationFailed() called");
-                Toast.makeText(getApplicationContext(), "verification failed !!! Try again.", Toast.LENGTH_LONG);
+                Constants.showLongToast(getApplicationContext(), "verification failed !!! Try again.");
                 enterRegistrationActivity();
             }
         };
@@ -143,7 +143,7 @@ public class ProcessingActivity extends AppCompatActivity {
                         boolean registered = response.getBoolean(Constants.JSON_REGISTERED);
                         if (registered) {
                             String token = response.getString(Constants.JSON_TOKEN);
-                            Toast.makeText(getApplicationContext(), "registered", Toast.LENGTH_SHORT);
+                            Constants.showLongToast(getApplicationContext(), "registered");
 
                             //saving data to shared preferences
                             Context context = getApplicationContext();
@@ -157,7 +157,7 @@ public class ProcessingActivity extends AppCompatActivity {
 
                             enterWelcomeActivity();
                         } else {
-                            Toast.makeText(getApplicationContext(), "registration failed !!! Try again.", Toast.LENGTH_LONG);
+                            Constants.showLongToast(getApplicationContext(), "registration failed !!! Try again.");
                             enterRegistrationActivity();
                         }
 

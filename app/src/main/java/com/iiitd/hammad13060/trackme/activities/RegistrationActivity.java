@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.iiitd.hammad13060.trackme.R;
 import com.iiitd.hammad13060.trackme.helpers.Constants;
@@ -24,6 +25,14 @@ public class RegistrationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
+
+        // setting value of edit text if registration failed
+        Intent ui_intet = getIntent();
+        if (ui_intet.hasExtra(EXTRA_UI_STATE)) {
+            String number = ui_intet.getStringExtra(EXTRA_UI_STATE);
+            EditText editText = (EditText)findViewById(R.id.contact_number_field);
+            editText.setText(number);
+        }
     }
 
     //enter processing activity if number found valid
@@ -33,6 +42,7 @@ public class RegistrationActivity extends AppCompatActivity {
         String contact_number = editText.getText().toString();
 
         if (isValidNumber(contact_number)) enterProcessingActivity(contact_number);
+        else Constants.showLongToast(this, "make sure number you entered is valid");
     }
 
     //checks if number is valid on the basis of lenght and starts with 7.8 or 9
@@ -50,6 +60,9 @@ public class RegistrationActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ProcessingActivity.class);
         intent.putExtra(Constants.EXTRA_CONTACT_NUMBER, number);
         startActivity(intent);
+        finish();
     }
+
+
 
 }
