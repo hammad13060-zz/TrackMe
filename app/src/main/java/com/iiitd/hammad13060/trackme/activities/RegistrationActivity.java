@@ -7,6 +7,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -38,7 +39,17 @@ public class RegistrationActivity extends AppCompatActivity {
     //enter processing activity if number found valid
     public void onRegister(View view) {
         //reading the text
+        /*TelephonyManager tm = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
+        String number2 = tm.getLine1Number();
+*/
         EditText editText = (EditText)findViewById(R.id.contact_number_field);
+  //      editText.setText(number2);
+
+        /*TelephonyManager tm = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
+        String number2 = tm.getLine1Number();
+        EditText editText2 = (EditText)findViewById(R.id.My_number);
+        editText2.setText(number2);*/
+
         String contact_number = editText.getText().toString();
 
         if (isValidNumber(contact_number)) enterProcessingActivity(contact_number);

@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -35,7 +36,7 @@ import org.json.JSONObject;
 public class ProcessingActivity extends AppCompatActivity {
     public static final String TAG = "ProcessingActivity";
     private static final String WEB_URL = Constants.SERVER_URL+ "registration/";
-
+    TextView text_process;
 
     private String contact_number = null;
     String phoneNumberInE164 = null;
@@ -63,6 +64,10 @@ public class ProcessingActivity extends AppCompatActivity {
             @Override
             public void onInitiated() {
                 Log.d(TAG, "verification: onInitiated() called");
+                text_process = (TextView) findViewById(R.id.processing_state_text_view);
+                text_process.setText("Verifying");
+                text_process = (TextView) findViewById(R.id.second_text_processing);
+                text_process.setText("Please wait...");
             }
 
             @Override
@@ -75,6 +80,11 @@ public class ProcessingActivity extends AppCompatActivity {
             @Override
             public void onVerified() {
                 Log.d(TAG, "verification: onVerified() called");
+                text_process = (TextView) findViewById(R.id.processing_state_text_view);
+                text_process.setText("Registering");
+                text_process = (TextView) findViewById(R.id.second_text_processing);
+                text_process.setText("Please wait...");
+
                 registerUser();
             }
 

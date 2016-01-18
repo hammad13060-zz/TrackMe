@@ -8,13 +8,35 @@
     tools:context="com.iiitd.hammad13060.trackme.activities.ProcessingActivity">
 
 
+
+
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Verifying"
         android:id="@+id/processing_state_text_view"
-        android:layout_centerVertical="true"
+        android:text="Verifying"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:textSize="70dp" />
+        android:textSize="@dimen/text_size"
+        android:layout_marginTop="129dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Please wait..."
+        android:id="@+id/second_text_processing"
+        android:textSize="15sp"
+        android:layout_below="@+id/processing_state_text_view"
+        android:layout_centerHorizontal="true" />
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBar2"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>

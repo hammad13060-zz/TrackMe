@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.iiitd.hammad13060.trackme.activities.WelcomeActivity">
+    tools:context="com.iiitd.hammad13060.trackme.activities.WelcomeActivity"
+    android:background="#FFFFFF">
 
 
     <TextView
@@ -16,14 +17,18 @@
         android:id="@+id/textView"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:textSize="70dp" />
+        android:textSize="70dp"
+        android:textColor="#0b0b0b" />
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Continue"
         android:id="@+id/continue_button"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:onClick="onContinueClicked" />
+        android:onClick="onContinueClicked"
+        android:background="#3F51B5"
+        android:textColor="#FFFFFF"
+        android:textSize="20dp" />
 </RelativeLayout>
