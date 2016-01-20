@@ -73,9 +73,5 @@
             android:layout_alignRight="@+id/contact_number_field"
             android:layout_alignEnd="@+id/contact_number_field"
             />
-
-
-
-
     </RelativeLayout>
 </LinearLayout>

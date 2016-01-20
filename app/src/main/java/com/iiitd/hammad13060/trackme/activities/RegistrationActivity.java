@@ -8,17 +8,23 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.iiitd.hammad13060.trackme.R;
 import com.iiitd.hammad13060.trackme.helpers.Constants;
+import com.iiitd.hammad13060.trackme.helpers.Contact;
+import com.iiitd.hammad13060.trackme.helpers.ContactsProvider;
 
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 public class RegistrationActivity extends AppCompatActivity {
+
+    private static final String TAG = "RegistrationActivity";
 
     public static final String EXTRA_UI_STATE = "com.iiitd.hammad13060.trackme.activities.UI_STATE";
 
@@ -34,6 +40,11 @@ public class RegistrationActivity extends AppCompatActivity {
             EditText editText = (EditText)findViewById(R.id.contact_number_field);
             editText.setText(number);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     //enter processing activity if number found valid
