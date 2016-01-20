@@ -31,6 +31,7 @@ import com.iiitd.hammad13060.trackme.Fragments.TwoFragment;
 import com.iiitd.hammad13060.trackme.R;
 import com.iiitd.hammad13060.trackme.helpers.Authentication;
 import com.iiitd.hammad13060.trackme.helpers.Constants;
+import com.iiitd.hammad13060.trackme.services.ContactListUpdateService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,8 +48,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!Authentication.hasAccess(getApplicationContext()))
+        Intent contactListUpdateServiceIntent = new Intent(getApplicationContext(), ContactListUpdateService.class);
+
+        if (!Authentication.hasAccess(getApplicationContext())) {
             enterRegistrationActivity();
+            stopService(contactListUpdateServiceIntent); //stopping service contact List Update Service
+        }
+
+        startService(contactListUpdateServiceIntent); //starting service contact List Update Service
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

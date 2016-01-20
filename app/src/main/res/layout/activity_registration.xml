@@ -23,10 +23,11 @@
             android:layout_alignParentStart="true"
             android:layout_marginTop="219dp"
             android:textSize="30dp"
-            android:layout_marginLeft="20dp" />
+            android:layout_marginLeft="40dp" />
 
-        <EditText
+        <!--EditText
             android:layout_width="200dp"
+            android:inputType="number"
             android:layout_height="wrap_content"
             android:id="@+id/contact_number_field"
             android:layout_alignTop="@+id/country_code_view"
@@ -36,16 +37,43 @@
             android:layout_marginEnd="50dp"
             android:layout_toRightOf="@+id/country_code_view"
             android:layout_toEndOf="@+id/country_code_view"
-            android:layout_marginLeft="15dp" />
+            android:layout_marginLeft="15dp" /-->
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="phone"
+            android:ems="10"
+            android:id="@+id/contact_number_field"
+            android:layout_alignTop="@+id/country_code_view"
+            android:layout_toRightOf="@+id/country_code_view"
+            android:layout_toEndOf="@+id/country_code_view"
+            android:maxLength="10"/>
 
         <Button
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="Register"
             android:id="@+id/register_button"
             android:layout_below="@+id/contact_number_field"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="47dp"
-            android:onClick="onRegister"/>
+            android:layout_marginLeft="30dp"
+            android:onClick="onRegister"
+            android:background="#3F51B5"
+            android:textColor="#FFFFFF"
+            android:textSize="20dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enter your mobile number to register"
+            android:id="@+id/textView2"
+            android:layout_marginBottom="67dp"
+            android:layout_above="@+id/contact_number_field"
+            android:layout_alignRight="@+id/contact_number_field"
+            android:layout_alignEnd="@+id/contact_number_field"
+            />
+
+
     </RelativeLayout>
 </LinearLayout>

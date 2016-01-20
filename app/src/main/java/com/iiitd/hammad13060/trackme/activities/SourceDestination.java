@@ -1,10 +1,12 @@
 package com.iiitd.hammad13060.trackme.activities;
 
 import android.content.Intent;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -24,11 +26,16 @@ public class SourceDestination extends AppCompatActivity implements GoogleApiCli
     private GoogleApiClient mGoogleApiClient = null;
     PlaceAutocompleteFragment autocompleteFragment = null;
 
+
+    private Place destinationPlace = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_source_destination);
 
+        Button startButton = (Button) findViewById(R.id.start_journey_button);
+        destinationPlace = null;
         mGoogleApiClient = new GoogleApiClient
                 .Builder(this)
                 .addApi(Places.GEO_DATA_API)
@@ -53,6 +60,7 @@ public class SourceDestination extends AppCompatActivity implements GoogleApiCli
 
     public void onStartButtonClicked(View view) {
         Intent intent = new Intent();
+        Bundle placeDataBundle = new Bundle();
         setResult(RESULT_OK, intent);
         finish();
     }
@@ -62,9 +70,11 @@ public class SourceDestination extends AppCompatActivity implements GoogleApiCli
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+
             @Override
             public void onPlaceSelected(Place place) {
                 // TODO: Get info about the selected place.
+                destinationPlace = place;
                 Log.i(TAG, "Place: " + place.getName());
             }
 
@@ -78,17 +88,18 @@ public class SourceDestination extends AppCompatActivity implements GoogleApiCli
 
     @Override
     public void onConnected(Bundle bundle) {
-
+        destinationPlace = null;
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-
+        destinationPlace = null;
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         Constants.showLongToast(getApplicationContext(), "some error occured while establishing connection with google play services");
+        destinationPlace = null;
         setResult(RESULT_CANCELED);
         finish();
     }

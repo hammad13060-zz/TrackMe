@@ -15,6 +15,8 @@ public class Constants {
     public static final String JSON_CONTACT_NUMBER = "_id";
     public static final String JSON_REGISTERED = "_registered";
     public static final String JSON_TOKEN = "_token";
+    public static final String JSON_CONTACTS = "_contacts";
+    public static final String JSON_BLOCKED = "_blocked";
 
     public static final String PREFERENCE_TOKEN_FILE = "PREFERENCE_TOKEN_FILE";
     public static final String PREFERENCE_TOKEN_FILE_ID = "_id";
