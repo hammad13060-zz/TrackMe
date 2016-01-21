@@ -10,6 +10,7 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -29,7 +30,6 @@ dependencies {
     compile 'com.mcxiaoke.volley:library-aar:1.0.0'
     compile 'com.android.support:support-v4:23.1.1'
     compile 'com.google.android.gms:play-services:8.4.0'
-    compile 'com.google.android.gms:play-services-location:8.4.0' //google places api
-
-    compile group: 'org.apache.httpcomponents' , name: 'httpclient-android' , version: '4.3.5.1'
+    //compile 'com.google.android.gms:play-services-location:8.4.0' //google places api
+    compile 'com.couchbase.lite:couchbase-lite-android:1.1.0'
 }

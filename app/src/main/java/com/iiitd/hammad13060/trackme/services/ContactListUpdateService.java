@@ -13,17 +13,17 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
+import com.iiitd.hammad13060.trackme.dbHandler.UsersDBHandler;
 import com.iiitd.hammad13060.trackme.helpers.Constants;
 import com.iiitd.hammad13060.trackme.helpers.Contact;
 import com.iiitd.hammad13060.trackme.helpers.ContactsProvider;
 import com.iiitd.hammad13060.trackme.helpers.JSONArrayRequest;
 import com.iiitd.hammad13060.trackme.helpers.JSONRequest;
-
-import org.apache.http.impl.client.HttpClients;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ContactListUpdateService extends Service {
@@ -126,14 +126,45 @@ public class ContactListUpdateService extends Service {
             responseListener = new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    //try {
-                        Log.d(TAG,"received: " + response.toString());
 
+                    UsersDBHandler usersDBHandler = new UsersDBHandler(getApplicationContext());
+
+                    Log.d(TAG,"received: " + response.toString());
+
+                    try {
+                        JSONArray contacts = response.getJSONArray(Constants.JSON_CONTACTS);
+
+                        for (int i = 0; i < contacts.length(); i++) {
+                            JSONObject contactJSON = contacts.getJSONObject(i);
+
+                            /*int id = contactJSON.getInt(Contact.CONTACT_JSON_ID);
+                            String name = contactJSON.getString(Contact.CONTACT_JSON_NAME);
+                            JSONArray numbers = contactJSON.getJSONArray(Contact.CONTACT_JSON_NUMBERS);
+
+                            List<String> phoneList = new ArrayList<>();
+
+                            for (int j = 0; j < numbers.length(); j++) {
+                                phoneList.add(numbers.getString(j));
+                            }
+
+
+                            Contact contact = new Contact();
+                            contact.id = id;
+                            contact.name = name;
+                            contact.phoneList = phoneList;*/
+
+                            Contact contact = Contact.jsonToContact(contactJSON);
+
+                            usersDBHandler.addUser(contact);
+
+                        }
+
+                        Log.d(TAG, usersDBHandler.getAllUsers().toString());
                         requestState = true;
 
-                    //} catch (JSONException e) {
-                      //  e.printStackTrace();
-                    //}
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             };
 

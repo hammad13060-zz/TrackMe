@@ -44,7 +44,7 @@ public class Contact {
 
     @Override
     public String toString() {
-        String text = "name: " + name + " mobile number: ";
+        String text = "id: " + id + "name: " + name + " mobile number: ";
         for (String number: phoneList) {
             text += number + ", ";
         }

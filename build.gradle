@@ -3,6 +3,9 @@
 buildscript {
     repositories {
         jcenter()
+        maven {
+            url "http://files.couchbase.com/maven2/"
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.5.0'
