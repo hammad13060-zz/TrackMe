@@ -127,44 +127,16 @@ public class ContactListUpdateService extends Service {
                 @Override
                 public void onResponse(JSONObject response) {
 
-                    UsersDBHandler usersDBHandler = new UsersDBHandler(getApplicationContext());
+                   UsersDBHandler usersDBHandler = new UsersDBHandler(getApplicationContext());
 
-                    Log.d(TAG,"received: " + response.toString());
+                    Log.d(TAG, "received: " + response.toString());
 
-                    try {
-                        JSONArray contacts = response.getJSONArray(Constants.JSON_CONTACTS);
+                    usersDBHandler.addUsers(response);
 
-                        for (int i = 0; i < contacts.length(); i++) {
-                            JSONObject contactJSON = contacts.getJSONObject(i);
+                    List<Contact> phoneList = usersDBHandler.getAllData();
+                    Log.d(TAG, "data saved: " + phoneList.toString());
 
-                            /*int id = contactJSON.getInt(Contact.CONTACT_JSON_ID);
-                            String name = contactJSON.getString(Contact.CONTACT_JSON_NAME);
-                            JSONArray numbers = contactJSON.getJSONArray(Contact.CONTACT_JSON_NUMBERS);
-
-                            List<String> phoneList = new ArrayList<>();
-
-                            for (int j = 0; j < numbers.length(); j++) {
-                                phoneList.add(numbers.getString(j));
-                            }
-
-
-                            Contact contact = new Contact();
-                            contact.id = id;
-                            contact.name = name;
-                            contact.phoneList = phoneList;*/
-
-                            Contact contact = Contact.jsonToContact(contactJSON);
-
-                            usersDBHandler.addUser(contact);
-
-                        }
-
-                        Log.d(TAG, usersDBHandler.getAllUsers().toString());
-                        requestState = true;
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                    requestState = true;
                 }
             };
 

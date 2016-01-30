@@ -24,7 +24,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.couchbase.lite.Manager;
+//import com.couchbase.lite.Manager;
 import com.iiitd.hammad13060.trackme.Fragments.JourneyFragment;
 import com.iiitd.hammad13060.trackme.Fragments.OneFragment;
 import com.iiitd.hammad13060.trackme.Fragments.TrackFragment;

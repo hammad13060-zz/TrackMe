@@ -3,92 +3,81 @@ package com.iiitd.hammad13060.trackme.dbHandler;
 import android.content.Context;
 import android.util.Log;
 
-import com.couchbase.lite.CouchbaseLiteException;
-import com.couchbase.lite.Database;
-import com.couchbase.lite.Document;
-import com.couchbase.lite.Manager;
-import com.couchbase.lite.QueryOptions;
-import com.couchbase.lite.android.AndroidContext;
+import com.iiitd.hammad13060.trackme.helpers.Constants;
 import com.iiitd.hammad13060.trackme.helpers.Contact;
+import com.snappydb.DB;
+import com.snappydb.DBFactory;
+import com.snappydb.SnappydbException;
 
-import java.io.IOException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
- * Created by hammad on 21/1/16.
+ * Created by hammad on 28/1/16.
  */
 public class UsersDBHandler {
 
-    private static final String TAG = "UsersDB";
+    public static final String TAG = "UsersDB";
+    private static final String DB_DATA = "_data";
+    private DB usersDB = null;
 
-    private Manager couchManager = null;
-    private Database usersDB = null;
 
-    public UsersDBHandler(Context context){
+    public UsersDBHandler(Context context) {
         try {
-            couchManager = new Manager(new AndroidContext(context), Manager.DEFAULT_OPTIONS);
-            usersDB = couchManager.getDatabase("users");
-        } catch (IOException e) {
-            couchManager = null;
-            usersDB = null;
-            e.printStackTrace();
-        } catch (CouchbaseLiteException e) {
-            couchManager = null;
-            usersDB = null;
+            this.usersDB = DBFactory.open(context);
+        } catch (SnappydbException e) {
+            this.usersDB = null;
             e.printStackTrace();
         }
     }
 
-    public void addUser(Contact contact) {
 
-        if (couchManager != null && usersDB != null) {
-            int _id = contact.id;
-            String _name = contact.name;
-            List<String> _phoneList = contact.phoneList;
-
-            Map<String, Object> properties = new HashMap<String, Object>();
-            properties.put("_id", _id);
-            properties.put("_name", _name);
-            properties.put("_phoneList", _phoneList);
-            Document document = usersDB.getDocument(Integer.toString(_id));
+    public void addUsers(JSONObject object) {
+        String jsonString = object.toString();
+        if (usersDB != null) {
             try {
-                document.putProperties(properties);
-            } catch (CouchbaseLiteException e) {
-                Log.d(TAG, "cannot save document");
+                usersDB.put(DB_DATA, jsonString);
+            } catch (SnappydbException e) {
+                Log.d(TAG, "could not save data");
                 e.printStackTrace();
             }
         }
     }
 
-    public List<Contact> getAllUsers() {
+    public List<Contact> getAllData() {
 
-        List<Contact> contacts = new ArrayList<>();
-
-        if (couchManager != null) {
+        List<Contact> contactList = new ArrayList<>();
+        if (usersDB != null) {
             try {
+                String objectString = usersDB.get(DB_DATA);
+                JSONObject dataObject = new JSONObject(objectString);
 
-                QueryOptions options = new QueryOptions();
-                options.getAllDocsMode();
-                options.setDescending(false);
-                Map<String, Object> allDocs = usersDB.getAllDocs(options);
+                JSONArray numberArray = dataObject.getJSONArray(Constants.JSON_CONTACTS);
 
-                Contact contact = new Contact();
-                contact.name = (String)allDocs.get("_name");
-                contact.id = (int)allDocs.get("_id");
-                contact.phoneList = (List<String>)allDocs.get("_phoneList");
+                for (int i = 0;i < numberArray.length(); i++) {
+                    Contact contact = Contact.jsonToContact(numberArray.getJSONObject(i));
+                    contactList.add(contact);
+                }
 
-                contacts.add(contact);
-
-            } catch (CouchbaseLiteException e) {
+            } catch (SnappydbException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
 
-        return contacts;
+        return contactList;
     }
 
-
+    public void closeDB() {
+        try {
+            usersDB.close();
+        } catch (SnappydbException e) {
+            e.printStackTrace();
+        }
+    }
 }
