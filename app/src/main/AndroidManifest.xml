@@ -7,9 +7,8 @@
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-
 
     <application
         android:allowBackup="true"
@@ -20,58 +19,65 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyA0w1WXH66tTgKQQLmErqek8jUP8JSo9Wk" />
+            <!--android:value="AIzaSyBSRoUFUQb6Pfk1FbyVzNQ6qwc7I96pwQA"!-->
+
+
+
 
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme.NoActionBar"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            >
 
         </activity>
         <activity
             android:name=".activities.RegistrationActivity"
             android:label="@string/title_activity_registration"
-            android:theme="@style/MyMaterialTheme.NoActionBar"
-            android:screenOrientation="portrait">
-            <!--intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            android:screenOrientation="portrait"
+            android:theme="@style/MyMaterialTheme.NoActionBar">
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter-->
+            <!--
+        intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter
+            -->
 
         </activity>
         <activity
             android:name=".activities.ProcessingActivity"
             android:label="@string/title_activity_processing"
-            android:theme="@style/MyMaterialTheme.NoActionBar"
-            android:screenOrientation="portrait">
-
-        </activity>
+            android:screenOrientation="portrait"
+            android:theme="@style/MyMaterialTheme.NoActionBar" />
         <activity
             android:name=".activities.WelcomeActivity"
             android:label="@string/title_activity_welcome"
-            android:theme="@style/MyMaterialTheme.NoActionBar"
-            android:screenOrientation="portrait">
-
-        </activity>
-
-        <activity android:name=".activities.SourceDestination" />
-        <activity android:name=".activities.MyLocation"
             android:screenOrientation="portrait"
-            android:theme="@style/MyMaterialTheme.NoActionBar">
+            android:theme="@style/MyMaterialTheme.NoActionBar" >
+
         </activity>
+
 
         <service
             android:name=".services.ContactListUpdateService"
             android:enabled="true"
             android:exported="true" />
+        <service
+            android:name=".SourceDestinationClasses.FetchAddressIntentService"
+            android:exported="false" />
 
-        <activity android:name=".activities.TestActivity"></activity>
+        <activity android:name=".activities.TestActivity" />
+        <activity android:name=".SourceDestinationClasses.MyDestination"></activity>
+        <activity android:name=".SourceDestinationClasses.Source">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
