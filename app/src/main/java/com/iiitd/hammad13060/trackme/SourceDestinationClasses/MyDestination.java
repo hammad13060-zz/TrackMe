@@ -1,7 +1,9 @@
 package com.iiitd.hammad13060.trackme.SourceDestinationClasses;
 
+import com.couchbase.lite.Context;
 import com.iiitd.hammad13060.trackme.R;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
@@ -9,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +25,7 @@ import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.iiitd.hammad13060.trackme.dbHandler.UsersDBHandler;
 
 
 public class MyDestination extends AppCompatActivity implements
@@ -40,6 +44,8 @@ public class MyDestination extends AppCompatActivity implements
     private PlaceArrayAdapter mPlaceArrayAdapter;
     private static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(
             new LatLng(37.398160, -122.180831), new LatLng(37.430610, -121.972090));
+
+//    UsersDBHandler usersDB = new UsersDBHandler(getApplicationContext());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +79,26 @@ public class MyDestination extends AppCompatActivity implements
         mPlaceArrayAdapter = new PlaceArrayAdapter(this, android.R.layout.simple_list_item_1,
                 BOUNDS_MOUNTAIN_VIEW, null);
         mAutocompleteTextView.setAdapter(mPlaceArrayAdapter);
+
+        selectContacts();
     }
+
+    public void selectContacts()
+    {
+        final Intent i = new Intent(this,SelectContacts.class);
+        Button contBtn = (Button) findViewById(R.id.contact_button);
+        contBtn.setOnClickListener(new View.OnClickListener(){
+
+
+            @Override
+            public void onClick(View v) {
+                startActivity(i);
+
+
+            }
+        });
+    }
+
 
     private AdapterView.OnItemClickListener mAutocompleteClickListener
             = new AdapterView.OnItemClickListener() {
@@ -136,4 +161,6 @@ public class MyDestination extends AppCompatActivity implements
         mPlaceArrayAdapter.setGoogleApiClient(null);
         Log.e(LOG_TAG, "Google Places API connection suspended.");
     }
+
+
 }
