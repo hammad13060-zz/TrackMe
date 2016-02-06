@@ -1,75 +1,77 @@
 package com.iiitd.hammad13060.trackme.SourceDestinationClasses;
 
 import com.iiitd.hammad13060.trackme.R;
-
-import android.Manifest;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Geocoder;
-import android.location.Location;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.ResultReceiver;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-public class Source extends AppCompatActivity implements
-        ConnectionCallbacks, OnConnectionFailedListener {
+import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.ActivityCompat;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
-    protected static final String TAG = "main-activity";
+public class Source extends Activity implements ConnectionCallbacks,
+        OnConnectionFailedListener {
+    // LogCat tag
+    private static final String TAG = "-- Source Class --";
 
-    protected static final String ADDRESS_REQUESTED_KEY = "address-request-pending";
-    protected static final String LOCATION_ADDRESS_KEY = "location-address";
+    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
 
-    protected GoogleApiClient mGoogleApiClient;
-    protected Location mLastLocation;
-    protected boolean mAddressRequested;
-    protected String mAddressOutput;
-    private AddressResultReceiver mResultReceiver;
-    ProgressBar mProgressBar;
-    Button mFetchAddressButton;
+    private Location mLastLocation;
+    private GoogleApiClient mGoogleApiClient;
+
+    double Source_latitude,Source_longitude;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_source);
-
-        mResultReceiver = new AddressResultReceiver(new Handler());
-
-        mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
-        mFetchAddressButton = (Button) findViewById(R.id.fetch_address_button);
-
-        // Set defaults, then update using values stored in the Bundle.
-        mAddressRequested = false;
-        mAddressOutput = "";
-        updateValuesFromBundle(savedInstanceState);
-
-        updateUIWidgets();
-        buildGoogleApiClient();
+        if (checkPlayServices()) {
+            buildGoogleApiClient();
+        }
+        displayLocation();
     }
 
-    private void updateValuesFromBundle(Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            if (savedInstanceState.keySet().contains(ADDRESS_REQUESTED_KEY)) {
-                mAddressRequested = savedInstanceState.getBoolean(ADDRESS_REQUESTED_KEY);
-            }
-            if (savedInstanceState.keySet().contains(LOCATION_ADDRESS_KEY)) {
-                mAddressOutput = savedInstanceState.getString(LOCATION_ADDRESS_KEY);
-                displayAddressOutput();
-            }
+    private void displayLocation() {
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        mLastLocation = LocationServices.FusedLocationApi
+                .getLastLocation(mGoogleApiClient);
+
+        if (mLastLocation != null) {
+            Source_latitude = mLastLocation.getLatitude();
+            Source_longitude = mLastLocation.getLongitude();
+            //String lat = Double.toString(latitude);
+            //String longi = Double.toString(longitude);
+            //String result = "Latitude : "+lat + "\nLongitude: " + longi;
+            /*Intent returnIntent = new Intent();
+            //returnIntent.putExtra("result",result);
+            returnIntent.putExtra("result1",latitude);
+            returnIntent.putExtra("result2",longitude);
+            setResult(Activity.RESULT_OK, returnIntent);
+            finish();*/
+            LocationAddress locationAddress = new LocationAddress();
+            locationAddress.getAddressFromLocation(Source_latitude, Source_longitude,
+                    getApplicationContext(), new GeocoderHandler());
+
+        } else {
+
         }
     }
 
@@ -77,116 +79,105 @@ public class Source extends AppCompatActivity implements
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
+                .addApi(LocationServices.API).build();
     }
 
-    public void fetchAddressButtonHandler(View view) {
-        // We only start the service to fetch the address if GoogleApiClient is connected.
-        if (mGoogleApiClient.isConnected() && mLastLocation != null) {
-            startIntentService();
+    private boolean checkPlayServices() {
+        int resultCode = GooglePlayServicesUtil
+                .isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
+                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            } else {
+                Toast.makeText(getApplicationContext(),
+                        "This device is not supported.", Toast.LENGTH_LONG)
+                        .show();
+                finish();
+            }
+            return false;
         }
-        mAddressRequested = true;
-        updateUIWidgets();
+        return true;
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        mGoogleApiClient.connect();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.connect();
         }
     }
 
     @Override
-    public void onConnected(Bundle connectionHint) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            return;
-        }
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (mLastLocation != null) {
-            if (!Geocoder.isPresent()) {
-                Toast.makeText(this, "no_geocoder_available", Toast.LENGTH_LONG).show();
-                return;
-            }
-            if (mAddressRequested) {
-                startIntentService();
-            }
-        }
-    }
+    protected void onResume() {
+        super.onResume();
 
-    protected void startIntentService() {
-        Intent intent = new Intent(this, FetchAddressIntentService.class);
-        intent.putExtra(Constants_SrcDest.RECEIVER, mResultReceiver);
-
-        intent.putExtra(Constants_SrcDest.LOCATION_DATA_EXTRA, mLastLocation);
-        startService(intent);
+        checkPlayServices();
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
-        Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
+        Log.i(TAG, "Connection failed:");
     }
 
+    @Override
+    public void onConnected(Bundle arg0) {
+        displayLocation();
+    }
 
     @Override
-    public void onConnectionSuspended(int cause) {
-        Log.i(TAG, "Connection suspended");
+    public void onConnectionSuspended(int arg0) {
         mGoogleApiClient.connect();
     }
 
-    protected void displayAddressOutput() {
-        Intent i = new Intent(this,MyDestination.class);
-        i.putExtra("sourceText", mAddressOutput);
-        startActivity(i);
+    private class GeocoderHandler extends Handler {
+        //TextView tvAddress = (TextView)findViewById(R.id.second_text_processing);
 
-    }
-
-    private void updateUIWidgets() {
-        if (mAddressRequested) {
-            mProgressBar.setVisibility(ProgressBar.VISIBLE);
-            mFetchAddressButton.setEnabled(false);
-        } else {
-            mProgressBar.setVisibility(ProgressBar.GONE);
-            mFetchAddressButton.setEnabled(true);
+        @Override
+        public void handleMessage(Message message) {
+            String locationAddress;
+            switch (message.what) {
+                case 1:
+                    Bundle bundle = message.getData();
+                    locationAddress = bundle.getString("address");
+                    break;
+                default:
+                    locationAddress = null;
+            }
+            //tvAddress.setText(locationAddress);
+            sendToDestination(locationAddress);
         }
     }
 
-    protected void showToast(String text) {
-        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+    void sendToDestination(String la)
+    {
+        Intent i = new Intent(this, MyDestination.class);
+        i.putExtra("sourceText",la);
+        startActivityForResult(i, 3);
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putBoolean(ADDRESS_REQUESTED_KEY, mAddressRequested);
-        savedInstanceState.putString(LOCATION_ADDRESS_KEY, mAddressOutput);
-        super.onSaveInstanceState(savedInstanceState);
-    }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Intent returnIntent_source = new Intent();
+        if (requestCode == 3) {
+            if(resultCode == Activity.RESULT_OK){
+                //String result=data.getStringExtra("result");
+                Double Destination_latitude = data.getDoubleExtra("resultDestLat1",0);
+                Double Destination_longitude = data.getDoubleExtra("resultDestLon2", 0);
 
-    class AddressResultReceiver extends ResultReceiver {
-        public AddressResultReceiver(Handler handler) {
-            super(handler);
-        }
 
-        @Override
-        protected void onReceiveResult(int resultCode, Bundle resultData) {
-            mAddressOutput = resultData.getString(Constants_SrcDest.RESULT_DATA_KEY);
+                //returnIntent.putExtra("result",result);
+                returnIntent_source.putExtra("resultSrcLat1",Source_latitude);
+                returnIntent_source.putExtra("resultSrcLon2",Source_longitude);
+                returnIntent_source.putExtra("resultDestLat1",Destination_latitude);
+                returnIntent_source.putExtra("resultDestLon2", Destination_longitude);
+                setResult(Activity.RESULT_OK, returnIntent_source);
+                finish();
 
-            displayAddressOutput();
-            if (resultCode == Constants_SrcDest.SUCCESS_RESULT) {
-                showToast("address_found");
             }
-            mAddressRequested = false;
-            updateUIWidgets();
+            if (resultCode == Activity.RESULT_CANCELED) {
+
+            }
         }
     }
 }
-
-

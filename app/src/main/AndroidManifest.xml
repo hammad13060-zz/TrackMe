@@ -25,7 +25,7 @@
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/MyMaterialTheme.NoActionBar"></activity>
+            android:theme="@style/MyMaterialTheme.NoActionBar" />
         <activity
             android:name=".activities.RegistrationActivity"
             android:label="@string/title_activity_registration"
@@ -50,26 +50,27 @@
             android:name=".activities.WelcomeActivity"
             android:label="@string/title_activity_welcome"
             android:screenOrientation="portrait"
-            android:theme="@style/MyMaterialTheme.NoActionBar"></activity>
+            android:theme="@style/MyMaterialTheme.NoActionBar" />
 
         <service
             android:name=".services.ContactListUpdateService"
             android:enabled="true"
             android:exported="true" />
-        <service
-            android:name=".SourceDestinationClasses.FetchAddressIntentService"
-            android:exported="false" />
+
 
         <activity android:name=".activities.TestActivity" />
-        <activity android:name=".SourceDestinationClasses.MyDestination" />
-        <activity android:name=".SourceDestinationClasses.Source">
+        <activity android:name=".SourceDestinationClasses.MyDestination">
+
+        </activity>
+        <activity android:name=".SourceDestinationClasses.Source"></activity>
+        <activity android:name=".SourceDestinationClasses.SelectContacts" />
+        <activity android:name=".SourceDestinationClasses.Source_Dst">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SourceDestinationClasses.SelectContacts"></activity>
     </application>
 
 </manifest>

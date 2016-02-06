@@ -31,6 +31,7 @@ import com.iiitd.hammad13060.trackme.Fragments.TrackFragment;
 import com.iiitd.hammad13060.trackme.Fragments.TwoFragment;
 import com.iiitd.hammad13060.trackme.R;
 import com.iiitd.hammad13060.trackme.SourceDestinationClasses.Source;
+import com.iiitd.hammad13060.trackme.SourceDestinationClasses.Source_Dst;
 import com.iiitd.hammad13060.trackme.helpers.Authentication;
 import com.iiitd.hammad13060.trackme.helpers.Constants;
 import com.iiitd.hammad13060.trackme.services.ContactListUpdateService;
@@ -75,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                    //     .setAction("Action", null).show();
-                Intent i = new Intent(MainActivity.this,Source.class);
+                Intent i = new Intent(MainActivity.this,Source_Dst.class);
                 startActivityForResult(i, SELECT_SOURCE_DESTINATION_REQUEST_CODE);
             }
         });
@@ -157,6 +158,11 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == SELECT_SOURCE_DESTINATION_REQUEST_CODE) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
+                Double Destination_lat = data.getDoubleExtra("DestLat",0);
+                Double Destination_longi = data.getDoubleExtra("DestLongi", 0);
+                Double Source_lat = data.getDoubleExtra("SrcLat",0);
+                Double Source_longi = data.getDoubleExtra("SrcLongi", 0);
+
                 // The user picked a contact.
                 // The Intent's data Uri identifies which contact was selected.
 

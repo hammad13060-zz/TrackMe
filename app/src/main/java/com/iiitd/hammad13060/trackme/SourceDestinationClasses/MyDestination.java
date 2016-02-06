@@ -3,8 +3,11 @@ package com.iiitd.hammad13060.trackme.SourceDestinationClasses;
 import com.couchbase.lite.Context;
 import com.iiitd.hammad13060.trackme.R;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
@@ -26,6 +29,7 @@ import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.iiitd.hammad13060.trackme.dbHandler.UsersDBHandler;
+import com.iiitd.hammad13060.trackme.helpers.Constants;
 
 
 public class MyDestination extends AppCompatActivity implements
@@ -42,6 +46,7 @@ public class MyDestination extends AppCompatActivity implements
     private TextView mAttTextView;
     private GoogleApiClient mGoogleApiClient;
     private PlaceArrayAdapter mPlaceArrayAdapter;
+    double Destlat = 0,DestLon = 0;
     private static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(
             new LatLng(37.398160, -122.180831), new LatLng(37.430610, -121.972090));
 
@@ -69,26 +74,51 @@ public class MyDestination extends AppCompatActivity implements
         mAutocompleteTextView = (AutoCompleteTextView) findViewById(R.id
                 .autoCompleteTextView);
         mAutocompleteTextView.setThreshold(3);
-        /*mNameTextView = (TextView) findViewById(R.id.name);
+        mIdTextView = (TextView) findViewById(R.id.place_id);
+        mNameTextView = (TextView) findViewById(R.id.name);
         mAddressTextView = (TextView) findViewById(R.id.address);
         mIdTextView = (TextView) findViewById(R.id.place_id);
         mPhoneTextView = (TextView) findViewById(R.id.phone);
         mWebTextView = (TextView) findViewById(R.id.web);
-        mAttTextView = (TextView) findViewById(R.id.att);*/
+        mAttTextView = (TextView) findViewById(R.id.att);
         mAutocompleteTextView.setOnItemClickListener(mAutocompleteClickListener);
         mPlaceArrayAdapter = new PlaceArrayAdapter(this, android.R.layout.simple_list_item_1,
                 BOUNDS_MOUNTAIN_VIEW, null);
         mAutocompleteTextView.setAdapter(mPlaceArrayAdapter);
 
+
+
         selectContacts();
+
+
+        Button startJourney = (Button) findViewById(R.id.start_journey);
+        startJourney.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                    Intent returnIntent = new Intent();
+                    //returnIntent.putExtra("result",result);
+                    if(Destlat == 0&& DestLon ==0)
+                    {
+                        Constants.showLongToast(getApplicationContext(), "Please choose corect Destination");
+                    }else {
+                        returnIntent.putExtra("resultDestLat1",Destlat);
+                        returnIntent.putExtra("resultDestLon2",DestLon);
+                        setResult(Activity.RESULT_OK, returnIntent);
+                        finish();
+                    }
+
+            }
+        });
     }
+
+
 
     public void selectContacts()
     {
         final Intent i = new Intent(this,SelectContacts.class);
         Button contBtn = (Button) findViewById(R.id.contact_button);
         contBtn.setOnClickListener(new View.OnClickListener(){
-
 
             @Override
             public void onClick(View v) {
@@ -109,12 +139,12 @@ public class MyDestination extends AppCompatActivity implements
             Log.i(LOG_TAG, "Selected: " + item.description);
             PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
                     .getPlaceById(mGoogleApiClient, placeId);
-            //placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
+            placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
             Log.i(LOG_TAG, "Fetching details for ID: " + item.placeId);
         }
     };
 
-    /*private ResultCallback<PlaceBuffer> mUpdatePlaceDetailsCallback
+    private ResultCallback<PlaceBuffer> mUpdatePlaceDetailsCallback
             = new ResultCallback<PlaceBuffer>() {
         @Override
         public void onResult(PlaceBuffer places) {
@@ -127,16 +157,41 @@ public class MyDestination extends AppCompatActivity implements
             final Place place = places.get(0);
             CharSequence attributions = places.getAttributions();
 
-            mNameTextView.setText(Html.fromHtml(place.getName() + ""));
-            mAddressTextView.setText(Html.fromHtml(place.getAddress() + ""));
-            mIdTextView.setText(Html.fromHtml(place.getId() + ""));
-            mPhoneTextView.setText(Html.fromHtml(place.getPhoneNumber() + ""));
-            mWebTextView.setText(place.getWebsiteUri() + "");
+            //mNameTextView.setText(Html.fromHtml(place.getName() + ""));
+            String ss = (String) (place.getAddress() + "");
+            GeocodingLocation locationAddress = new GeocodingLocation();
+            locationAddress.getAddressFromLocation(ss,
+                    getApplicationContext(), new GeocoderHandler());
+            //mAddressTextView.setText(ss);
+            //mIdTextView.setText(Html.fromHtml(place.getId() + ""));
+            //mPhoneTextView.setText(Html.fromHtml(place.getPhoneNumber() + ""));
+            //mWebTextView.setText(place.getWebsiteUri() + "");
             if (attributions != null) {
                 mAttTextView.setText(Html.fromHtml(attributions.toString()));
             }
         }
-    };*/
+    };
+
+    private class GeocoderHandler extends Handler {
+
+        TextView latLongTV = (TextView) findViewById(R.id.place_id);
+
+        @Override
+        public void handleMessage(Message message) {
+
+            switch (message.what) {
+                case 1:
+                    Bundle bundle = message.getData();
+                    Destlat = bundle.getDouble("DestLat");
+                    DestLon = bundle.getDouble("DestLon");
+                    break;
+                default:
+                    Destlat = 0;
+            }
+            //String ss = "Lat " + Double.toString(Destlat)+ "\nLon "+ Double.toString(DestLon);
+            //latLongTV.setText(ss);
+        }
+    }
 
     @Override
     public void onConnected(Bundle bundle) {
