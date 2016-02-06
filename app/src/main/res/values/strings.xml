@@ -6,6 +6,7 @@
     <string name="title_activity_processing">ProcessingActivity</string>
     <string name="sinch_app_key">82224d5f-b267-4c5b-9d73-27b895c29d10</string>
     <string name="title_activity_welcome">WelcomeActivity</string>
+    <string name="google_api_key">AIzaSyC3bg2kTb5O6x3E3WMg-cuwLCuR7CKJ9TI</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

@@ -1,9 +1,11 @@
 package com.iiitd.hammad13060.trackme.activities;
 
 
+import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -25,17 +27,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 //import com.couchbase.lite.Manager;
+import com.iiitd.hammad13060.trackme.BroadCastReceivers.CurrentLocationReceiver;
 import com.iiitd.hammad13060.trackme.Fragments.JourneyFragment;
 import com.iiitd.hammad13060.trackme.Fragments.OneFragment;
 import com.iiitd.hammad13060.trackme.Fragments.TrackFragment;
 import com.iiitd.hammad13060.trackme.Fragments.TwoFragment;
+import com.iiitd.hammad13060.trackme.MyLocationInterface;
 import com.iiitd.hammad13060.trackme.R;
 import com.iiitd.hammad13060.trackme.SourceDestinationClasses.Source;
 import com.iiitd.hammad13060.trackme.helpers.Authentication;
 import com.iiitd.hammad13060.trackme.helpers.Constants;
 import com.iiitd.hammad13060.trackme.services.ContactListUpdateService;
+import com.iiitd.hammad13060.trackme.services.JourneyService;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MyLocationInterface {
 
     private Toolbar toolbar;
     private TabLayout tabLayout;
@@ -45,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Fragment journeyFragment = null;
     private Fragment trackFragment = null;
+
+    private BroadcastReceiver currentLocationReceiver = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +88,18 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerMyLocationReceiver();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterMyLocationReceiver();
+    }
+
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
@@ -90,6 +109,11 @@ public class MainActivity extends AppCompatActivity {
         adapter.addFragment(journeyFragment, "Journey");
         adapter.addFragment(trackFragment, "Track");
         viewPager.setAdapter(adapter);
+    }
+
+    @Override
+    public void myLocationUpdate(double latitude, double longitude) {
+
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
@@ -153,17 +177,23 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Check which request we're responding to
-        if (requestCode == SELECT_SOURCE_DESTINATION_REQUEST_CODE) {
-            // Make sure the request was successful
-            if (resultCode == RESULT_OK) {
-                // The user picked a contact.
-                // The Intent's data Uri identifies which contact was selected.
 
-                // Do something with the contact here (bigger example below)
+        if (requestCode == SELECT_SOURCE_DESTINATION_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+
             } else if (resultCode == RESULT_CANCELED) {
 
             }
         }
+    }
+
+    private void registerMyLocationReceiver() {
+        currentLocationReceiver = new CurrentLocationReceiver(this);
+        IntentFilter intentFilter = new IntentFilter("com.iiitd.hammad13060.trackme.BroadCastReceivers.CurrentLocationReceiver");
+        registerReceiver(currentLocationReceiver, intentFilter);
+    }
+
+    private void unregisterMyLocationReceiver() {
+        unregisterReceiver(currentLocationReceiver);
     }
 }

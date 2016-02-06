@@ -8,7 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.iiitd.hammad13060.trackme.R;
+import com.iiitd.hammad13060.trackme.services.JourneyService;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,6 +32,8 @@ public class JourneyFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    private OnMapReadyCallback onMapReadyCallback = null;
 
     public JourneyFragment() {
         // Required empty public constructor
@@ -65,7 +70,8 @@ public class JourneyFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_journey, container, false);
+        if (JourneyService.journeyRunning) return inflater.inflate(R.layout.fragment_journey_map, container, false);
+        else return inflater.inflate(R.layout.fragment_journey, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -105,5 +111,22 @@ public class JourneyFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    public void setMap() {
+        initOnMapReadyCallback();
+    }
+
+    private void initOnMapReadyCallback() {
+        onMapReadyCallback = new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+
+            }
+        };
+    }
+
+    public void setNoJourney() {
+
     }
 }

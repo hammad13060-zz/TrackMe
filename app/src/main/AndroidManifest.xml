@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     android:name="com.iiitd.hammad13060.trackme.GenericApplication"
-    package="com.iiitd.hammad13060.trackme">
+    package="com.iiitd.hammad13060.trackme" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_SMS" />
@@ -15,28 +15,28 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/MyMaterialTheme">
+        android:theme="@style/MyMaterialTheme" >
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyA0w1WXH66tTgKQQLmErqek8jUP8JSo9Wk" />
-            <!--android:value="AIzaSyBSRoUFUQb6Pfk1FbyVzNQ6qwc7I96pwQA"!-->
-
-
-
+        <!-- android:value="AIzaSyBSRoUFUQb6Pfk1FbyVzNQ6qwc7I96pwQA"! -->
 
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/MyMaterialTheme.NoActionBar"
-            >
+            android:theme="@style/MyMaterialTheme.NoActionBar" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".activities.RegistrationActivity"
             android:label="@string/title_activity_registration"
             android:screenOrientation="portrait"
-            android:theme="@style/MyMaterialTheme.NoActionBar">
+            android:theme="@style/MyMaterialTheme.NoActionBar" >
 
             <!--
         intent-filter>
@@ -56,10 +56,7 @@
             android:name=".activities.WelcomeActivity"
             android:label="@string/title_activity_welcome"
             android:screenOrientation="portrait"
-            android:theme="@style/MyMaterialTheme.NoActionBar" >
-
-        </activity>
-
+            android:theme="@style/MyMaterialTheme.NoActionBar" />
 
         <service
             android:name=".services.ContactListUpdateService"
@@ -70,14 +67,25 @@
             android:exported="false" />
 
         <activity android:name=".activities.TestActivity" />
-        <activity android:name=".SourceDestinationClasses.MyDestination"></activity>
-        <activity android:name=".SourceDestinationClasses.Source">
+        <activity android:name=".SourceDestinationClasses.MyDestination" />
+        <activity android:name=".SourceDestinationClasses.Source" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".services.JourneyService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <receiver
+            android:name=".BroadCastReceivers.CurrentLocationReceiver"
+            android:enabled="true"
+            android:exported="true" >
+        </receiver>
     </application>
 
 </manifest>
