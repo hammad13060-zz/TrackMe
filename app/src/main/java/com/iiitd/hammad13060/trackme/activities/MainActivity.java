@@ -2,12 +2,8 @@ package com.iiitd.hammad13060.trackme.activities;
 
 
 import android.content.Intent;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -26,14 +22,10 @@ import android.view.MenuItem;
 
 //import com.couchbase.lite.Manager;
 import com.iiitd.hammad13060.trackme.Fragments.JourneyFragment;
-import com.iiitd.hammad13060.trackme.Fragments.OneFragment;
 import com.iiitd.hammad13060.trackme.Fragments.TrackFragment;
-import com.iiitd.hammad13060.trackme.Fragments.TwoFragment;
 import com.iiitd.hammad13060.trackme.R;
-import com.iiitd.hammad13060.trackme.SourceDestinationClasses.Source;
-import com.iiitd.hammad13060.trackme.SourceDestinationClasses.Source_Dst;
+import com.iiitd.hammad13060.trackme.SourceDestinationClasses.LoadingScreen;
 import com.iiitd.hammad13060.trackme.helpers.Authentication;
-import com.iiitd.hammad13060.trackme.helpers.Constants;
 import com.iiitd.hammad13060.trackme.services.ContactListUpdateService;
 
 public class MainActivity extends AppCompatActivity {
@@ -76,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                    //     .setAction("Action", null).show();
-                Intent i = new Intent(MainActivity.this,Source_Dst.class);
+                Intent i = new Intent(MainActivity.this,LoadingScreen.class);
                 startActivityForResult(i, SELECT_SOURCE_DESTINATION_REQUEST_CODE);
             }
         });

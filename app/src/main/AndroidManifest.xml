@@ -9,7 +9,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -25,7 +26,14 @@
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/MyMaterialTheme.NoActionBar" />
+            android:theme="@style/MyMaterialTheme.NoActionBar" >
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            </activity>
         <activity
             android:name=".activities.RegistrationActivity"
             android:label="@string/title_activity_registration"
@@ -57,20 +65,19 @@
             android:enabled="true"
             android:exported="true" />
 
-
         <activity android:name=".activities.TestActivity" />
-        <activity android:name=".SourceDestinationClasses.MyDestination">
-
-        </activity>
-        <activity android:name=".SourceDestinationClasses.Source"></activity>
+        <activity android:name=".SourceDestinationClasses.MyDestination" />
+        <activity android:name=".SourceDestinationClasses.Source" />
         <activity android:name=".SourceDestinationClasses.SelectContacts" />
-        <activity android:name=".SourceDestinationClasses.Source_Dst">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        <activity android:name=".SourceDestinationClasses.LoadingScreen" />
+        <activity
+            android:name=".SourceDestinationClasses.ForTesting"
+            android:label="@string/title_activity_for_testing"
+            android:theme="@style/MyMaterialTheme">
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
+        <activity android:name=".SourceDestinationClasses.SourceDestinationUI" />
+        <activity android:name=".SourceDestinationClasses.CurrentSource"></activity>
     </application>
 
 </manifest>

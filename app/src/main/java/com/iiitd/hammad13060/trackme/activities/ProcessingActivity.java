@@ -50,7 +50,7 @@ public class ProcessingActivity extends AppCompatActivity {
     }
 
     private void verifyUser() {
-        Config config = SinchVerification.config().applicationKey("82224d5f-b267-4c5b-9d73-27b895c29d10")
+        Config config = SinchVerification.config().applicationKey("4f04cf10-b2ef-40d6-9133-bbbf98f6942b")
                 .context(getApplicationContext()).build();
         VerificationListener listener = initVerificationListener();
         String defaultRegion = PhoneNumberUtils.getDefaultCountryIso(this);
