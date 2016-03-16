@@ -1,6 +1,7 @@
 package com.iiitd.hammad13060.trackme.activities;
 
 
+import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.Context;
@@ -8,12 +9,14 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.support.v4.app.*;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -22,26 +25,39 @@ import android.support.v4.app.FragmentPagerAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
 //import com.couchbase.lite.Manager;
 import com.iiitd.hammad13060.trackme.BroadCastReceivers.CurrentLocationReceiver;
+import com.iiitd.hammad13060.trackme.BroadCastReceivers.JourneyReadyReceiver;
+import com.iiitd.hammad13060.trackme.Fragments.ArchivedFragment;
 import com.iiitd.hammad13060.trackme.Fragments.JourneyFragment;
 import com.iiitd.hammad13060.trackme.Fragments.OneFragment;
 import com.iiitd.hammad13060.trackme.Fragments.TrackFragment;
 import com.iiitd.hammad13060.trackme.Fragments.TwoFragment;
+import com.iiitd.hammad13060.trackme.JourneyReadyInterface;
 import com.iiitd.hammad13060.trackme.MyLocationInterface;
 import com.iiitd.hammad13060.trackme.R;
 import com.iiitd.hammad13060.trackme.SourceDestinationClasses.Source;
 import com.iiitd.hammad13060.trackme.SourceDestinationClasses.Source_Dst;
+import com.iiitd.hammad13060.trackme.cloudeMessaging.MyGcmListenerService;
+import com.iiitd.hammad13060.trackme.cloudeMessaging.MyInstanceIDListenerService;
 import com.iiitd.hammad13060.trackme.helpers.Authentication;
 import com.iiitd.hammad13060.trackme.helpers.Constants;
+import com.iiitd.hammad13060.trackme.helpers.Contact;
 import com.iiitd.hammad13060.trackme.services.ContactListUpdateService;
 import com.iiitd.hammad13060.trackme.services.JourneyService;
 
-public class MainActivity extends AppCompatActivity implements MyLocationInterface {
+public class MainActivity extends AppCompatActivity implements JourneyReadyInterface {
+
+    public static final String EXTRA_SRC_LAT= "com.iiitd.hammad13060.trackme.activities.SRC_LAT";
+    public static final String EXTRA_SRC_LONG= "com.iiitd.hammad13060.trackme.activities.SRC_LONG";
+    public static final String EXTRA_DST_LAT= "com.iiitd.hammad13060.trackme.activities.DEST_LAT";
+    public static final String EXTRA_DST_LONG= "com.iiitd.hammad13060.trackme.activities.DEST_LONG";
+    public static final String EXTRA_CONTACT_LIST = "com.iiitd.hammad13060.trackme.activities.EXTRA_CONTACT_LIST";
 
     private Toolbar toolbar;
     private TabLayout tabLayout;
@@ -49,21 +65,24 @@ public class MainActivity extends AppCompatActivity implements MyLocationInterfa
 
     static final int SELECT_SOURCE_DESTINATION_REQUEST_CODE = 1;
 
-    private Fragment journeyFragment = null;
-    private Fragment trackFragment = null;
+    private JourneyFragment journeyFragment = null;
+    private TrackFragment trackFragment = null;
+    private ArchivedFragment archivedFragment = null;
 
     private BroadcastReceiver currentLocationReceiver = null;
+    private BroadcastReceiver journeyReadyReciever = null;
+
+    ViewPagerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intent contactListUpdateServiceIntent = new Intent(getApplicationContext(), ContactListUpdateService.class);
 
-        if (!Authentication.hasAccess(getApplicationContext())) {
-            enterRegistrationActivity();
-            stopService(contactListUpdateServiceIntent); //stopping service contact List Update Service
-        } else startService(contactListUpdateServiceIntent); //starting service contact List Update Service
+        /*Intent gcmListnerIntent = new Intent(this, MyGcmListenerService.class);
+        Intent gcmIDListnerIntent = new Intent(this, MyInstanceIDListenerService.class);
+        startService(gcmListnerIntent);
+        startService(gcmIDListnerIntent);*/
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -76,7 +95,6 @@ public class MainActivity extends AppCompatActivity implements MyLocationInterfa
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,30 +110,29 @@ public class MainActivity extends AppCompatActivity implements MyLocationInterfa
     @Override
     protected void onResume() {
         super.onResume();
-        registerMyLocationReceiver();
+        registerJourneyReadyReciever();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterMyLocationReceiver();
+        unregisterJourneyReadyReciever();
     }
 
     private void setupViewPager(ViewPager viewPager) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         journeyFragment = new JourneyFragment();
         trackFragment = new TrackFragment();
+        archivedFragment = new ArchivedFragment();
 
         adapter.addFragment(journeyFragment, "Journey");
         adapter.addFragment(trackFragment, "Track");
+        adapter.addFragment(archivedFragment, "Completed Journeys");
         viewPager.setAdapter(adapter);
     }
 
-    @Override
-    public void myLocationUpdate(double latitude, double longitude) {
 
-    }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
@@ -181,27 +198,64 @@ public class MainActivity extends AppCompatActivity implements MyLocationInterfa
 
         if (requestCode == SELECT_SOURCE_DESTINATION_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                Double Destination_lat = data.getDoubleExtra("DestLat",0);
-                Double Destination_longi = data.getDoubleExtra("DestLongi", 0);
-                Double Source_lat = data.getDoubleExtra("SrcLat",0);
-                Double Source_longi = data.getDoubleExtra("SrcLongi", 0);
-
-                // The user picked a contact.
-                // The Intent's data Uri identifies which contact was selected.
-
+                startJourneyService(data);
             } else if (resultCode == RESULT_CANCELED) {
-
+                Constants.showLongToast(this, "Journey setup failed !!! Try again !!!");
             }
         }
     }
 
-    private void registerMyLocationReceiver() {
-        currentLocationReceiver = new CurrentLocationReceiver(this);
-        IntentFilter intentFilter = new IntentFilter("com.iiitd.hammad13060.trackme.BroadCastReceivers.CurrentLocationReceiver");
-        registerReceiver(currentLocationReceiver, intentFilter);
+
+    private void registerJourneyReadyReciever() {
+        journeyReadyReciever = new JourneyReadyReceiver(this);
+        IntentFilter intentFilter = new IntentFilter(JourneyReadyReceiver.ACTION_VALUE);
+        registerReceiver(journeyReadyReciever, intentFilter);
     }
 
-    private void unregisterMyLocationReceiver() {
-        unregisterReceiver(currentLocationReceiver);
+    private void unregisterJourneyReadyReciever() {
+        unregisterReceiver(journeyReadyReciever);
+    }
+
+    private void startJourneyService(Intent data) {
+        Intent serviceIntent = new Intent(this, JourneyService.class);
+
+        Double Destination_lat = data.getDoubleExtra("DestLat",0);
+        Double Destination_longi = data.getDoubleExtra("DestLongi", 0);
+        Double Source_lat = data.getDoubleExtra("SrcLat",0);
+        Double Source_longi = data.getDoubleExtra("SrcLongi", 0);
+        Log.d("MainActivity", "got result");
+        Log.d("MainActivity", String.valueOf(Destination_lat));
+        Log.d("MainActivity", String.valueOf(Destination_longi));
+        Log.d("MainActivity", String.valueOf(Source_lat));
+        Log.d("MainActivity", String.valueOf(Source_longi));
+
+        serviceIntent.putExtra(EXTRA_DST_LAT, Destination_lat);
+        serviceIntent.putExtra(EXTRA_DST_LONG, Destination_longi);
+        serviceIntent.putExtra(EXTRA_SRC_LAT, Source_lat);
+        serviceIntent.putExtra(EXTRA_SRC_LONG, Source_longi);
+
+        /////////////////////////////////////////////////////DUMMY/////////////////////////////////////
+        Parcelable[] p = dummyContactData();
+        serviceIntent.putExtra(EXTRA_CONTACT_LIST, p);
+        startService(serviceIntent);
+    }
+
+
+
+    @Override
+    public void journeyData(Intent intent) {
+        if (journeyFragment != null)  journeyFragment.resetJourney(intent);
+    }
+
+
+    private Parcelable[] dummyContactData() {
+        Contact contact = new Contact();
+        contact.id = 1;
+        contact.name = "Hammad Akhtar";
+        contact.phoneList.add("+919718052178");
+
+        Parcelable[] p = {contact};
+
+        return p;
     }
 }

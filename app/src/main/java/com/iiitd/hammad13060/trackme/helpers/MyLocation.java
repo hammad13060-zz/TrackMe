@@ -43,7 +43,7 @@ public class MyLocation implements LocationListener {
 
         if (isGPSEnabled) {
             Log.d(TAG, "gps provider enabled");
-            if (ActivityCompat.checkSelfPermission(this.context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(this.context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 Log.d(TAG, "yes we have proper permissions");
                 currentLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, this);
@@ -86,7 +86,8 @@ public class MyLocation implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {
         currentLocation = location;
-        Intent intent = new Intent(context, CurrentLocationReceiver.class);
+        Intent intent = new Intent();
+        intent.setAction("com.iiitd.hammad13060.trackme.BroadCastReceivers.CurrentLocationReceiver");
         intent.putExtra(EXTRA_MY_LAT, currentLocation.getLatitude());
         intent.putExtra(EXTRA_MY_LONG, currentLocation.getLongitude());
         context.sendBroadcast(intent);

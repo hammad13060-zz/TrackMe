@@ -89,7 +89,7 @@ public class ContactsProvider {
                     String phoneNumber = prependCountryCode(phoneCursor.getString(phoneCursor.getColumnIndex(PHONE_NUMBER)));
                     if (phoneNumber != null) {
                         contact.hasMobile = true;
-                        Log.d(TAG, "Mobile number: " + phoneNumber);
+                        //Log.d(TAG, "Mobile number: " + phoneNumber);
                         contact.addMobile(phoneNumber);
                     }
                 }
