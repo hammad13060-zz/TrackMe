@@ -1,6 +1,8 @@
 package com.iiitd.hammad13060.trackme.helpers;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.provider.ContactsContract.Data;
 import android.text.method.HideReturnsTransformationMethod;
 import android.util.Log;
@@ -17,7 +19,7 @@ import java.util.List;
 /**
  * Created by hammad on 17/1/16.
  */
-public class Contact {
+public class Contact implements Parcelable {
 
     private static final String TAG = "Contact";
 
@@ -31,12 +33,26 @@ public class Contact {
     public String email;
     public String uriString;
     public boolean hasMobile;
+    public boolean box;
 
 
     public Contact() {
         hasMobile = false;
         phoneList = new ArrayList<>(0);
     }
+
+    //Constructor for fake contacts only
+    /*public Contact(int id,String name)
+    {
+        this.id = id;
+        this.name = name;
+    }*/
+    public String getName() {
+        return name;
+    }
+
+    //
+
 
     public void addMobile(String mobile) {
         phoneList.add(mobile);
@@ -84,5 +100,50 @@ public class Contact {
         contact.name = name;
         contact.id = id;
         return contact;
+    }
+
+    public static final Parcelable.Creator CREATOR
+            = new Parcelable.Creator() {
+        public Contact createFromParcel(Parcel in) {
+            return new Contact(in);
+        }
+
+        public Contact[] newArray(int size) {
+            return new Contact[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+
+/*
+* public int id;
+public String name;
+public List<String> phoneList;
+public String email;
+public String uriString;
+public boolean hasMobile;
+* */
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(name);
+        dest.writeList(phoneList);
+        dest.writeString(email);
+        dest.writeString(uriString);
+
+    }
+
+    public Contact(Parcel in) {
+        id = in.readInt();
+        name = in.readString();
+        phoneList = new ArrayList<String>();
+        in.readList(phoneList, null);
+        email = in.readString();
+        uriString = in.readString();
     }
 }

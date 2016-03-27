@@ -27,7 +27,6 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme.NoActionBar" >
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -69,13 +68,9 @@
         <activity android:name=".SourceDestinationClasses.MyDestination" />
         <activity android:name=".SourceDestinationClasses.Source" />
         <activity android:name=".SourceDestinationClasses.SelectContacts" />
-        <activity android:name=".SourceDestinationClasses.LoadingScreen" />
-        <activity
-            android:name=".SourceDestinationClasses.ForTesting"
-            android:label="@string/title_activity_for_testing"
-            android:theme="@style/MyMaterialTheme">
+        <activity android:name=".SourceDestinationClasses.LoadingScreen" >
 
-        </activity>
+            </activity>
         <activity android:name=".SourceDestinationClasses.SourceDestinationUI" />
         <activity android:name=".SourceDestinationClasses.CurrentSource"></activity>
     </application>

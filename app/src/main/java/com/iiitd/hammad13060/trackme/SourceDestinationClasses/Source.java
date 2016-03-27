@@ -8,6 +8,7 @@ import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.location.LocationServices;
 import com.iiitd.hammad13060.trackme.helpers.Constants;
+import com.iiitd.hammad13060.trackme.helpers.Contact;
 
 import android.Manifest;
 import android.app.Activity;
@@ -17,9 +18,13 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Source extends Activity implements ConnectionCallbacks,
         OnConnectionFailedListener {
@@ -27,7 +32,7 @@ public class Source extends Activity implements ConnectionCallbacks,
     private static final String TAG = "-- Source Class --";
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
-
+    public static List<Contact> selectedContactList = new ArrayList<>();
     private Location mLastLocation;
     private GoogleApiClient mGoogleApiClient;
 
@@ -172,11 +177,13 @@ public class Source extends Activity implements ConnectionCallbacks,
                 //String result=data.getStringExtra("result");
                 Double Destination_latitude = data.getDoubleExtra("resultDestLat1",0);
                 Double Destination_longitude = data.getDoubleExtra("resultDestLon2", 0);
+                selectedContactList = data.getParcelableArrayListExtra("contList");
                 //returnIntent.putExtra("result",result);
                 returnIntent_source.putExtra("resultSrcLat1",Source_latitude);
                 returnIntent_source.putExtra("resultSrcLon2",Source_longitude);
                 returnIntent_source.putExtra("resultDestLat1",Destination_latitude);
                 returnIntent_source.putExtra("resultDestLon2", Destination_longitude);
+                returnIntent_source.putParcelableArrayListExtra("contList", (ArrayList<? extends Parcelable>) selectedContactList);
                 setResult(Activity.RESULT_OK, returnIntent_source);
                 finish();
 

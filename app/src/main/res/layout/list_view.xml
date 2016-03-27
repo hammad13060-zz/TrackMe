@@ -1,26 +1,44 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:padding="10dp"
+    android:weightSum="1">
+
+
+    <!--TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+
+        android:text="TextView" />
 
     <CheckBox
         android:id="@+id/chk_box"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_height="49dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignBaseline="@+id/name"
+        android:layout_alignBottom="@+id/name"
+        android:layout_toRightOf="@+id/name"
         android:focusable="false"
         android:focusableInTouchMode="false"
-        android:text="" />
+        android:layout_weight="0.07"
+        android:checked="false" /!-->
+        <CheckBox
+            android:id="@+id/chk_box"
+            android:layout_width="wrap_content"
+            android:layout_height="55dp"
+            android:padding="5dp"
+            android:focusable="false"
+            android:layout_weight="0.10" />
 
-    <TextView
-        android:id="@+id/name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/chk_box"
-        android:layout_alignBottom="@+id/chk_box"
-        android:layout_toRightOf="@+id/chk_box"
-        android:text="TextView" />
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black" />
 
-
-
-</RelativeLayout>
+    </LinearLayout>

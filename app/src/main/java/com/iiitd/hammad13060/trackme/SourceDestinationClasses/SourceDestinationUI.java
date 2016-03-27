@@ -5,24 +5,34 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.support.v7.widget.Toolbar;
 
 import com.iiitd.hammad13060.trackme.R;
 import com.iiitd.hammad13060.trackme.helpers.Constants;
+import com.iiitd.hammad13060.trackme.helpers.Contact;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SourceDestinationUI extends AppCompatActivity {
 
-
+    //public static List<Contact> selectContact = new ArrayList<>();
+    public static List<Contact> selectContact = new ArrayList<>();
     Double Destination_latitude=0.0,Destination_longitude=0.0;
     public String fullDestination,NewSource;
+    public static final String TAG = "SourceDestinationUI";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +95,7 @@ public class SourceDestinationUI extends AppCompatActivity {
                 else {
                     returnIntent_source.putExtra("resultDestLat1", Destination_latitude);
                     returnIntent_source.putExtra("resultDestLon2", Destination_longitude);
+                    returnIntent_source.putParcelableArrayListExtra("contList", (ArrayList<? extends Parcelable>)selectContact);
                     setResult(Activity.RESULT_OK, returnIntent_source);
                     finish();
                 }
@@ -104,17 +115,17 @@ public class SourceDestinationUI extends AppCompatActivity {
 
     public void selectContacts()
     {
-        final Intent i = new Intent(this,SelectContacts.class);
+
         Button contBtn = (Button) findViewById(R.id.contact_button);
         contBtn.setOnClickListener(new View.OnClickListener(){
 
             @Override
             public void onClick(View v) {
-                startActivity(i);
-
-
+                Intent i = new Intent(SourceDestinationUI.this,SelectContacts.class);
+                startActivityForResult(i,74);
             }
         });
+
     }
 
     @Override
@@ -162,16 +173,47 @@ public class SourceDestinationUI extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        TextView destinationtext = (TextView)findViewById(R.id.DestinationText);
-        TextView sourcetext2 = (TextView)findViewById(R.id.sourceText);
-        String fd,sd;
-        if (requestCode == 4) {
-            if(resultCode == Activity.RESULT_OK){
 
-                Destination_latitude = data.getDoubleExtra("resultDestLat1",0);
+        if (requestCode == 74) {
+            if (resultCode == Activity.RESULT_OK) {
+                selectContact = data.getParcelableArrayListExtra("contList");
+                Log.d(TAG, "Selected Contacts are:  " + selectContact.get(0).toString());
+                for (Contact c : selectContact) {
+                        Log.d(TAG, "Selected Contacts are:  " + c.getName());
+                }
+
+                ListView listView = (ListView) findViewById(R.id.listViewContacts);
+                int n = selectContact.size();
+                String[] conts = new String[n];
+                for(int i=0;i<n;i++)
+                {
+                    Contact c = selectContact.get(i);
+                    conts[i] = c.getName();
+                }
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                        android.R.layout.simple_list_item_1, conts);
+
+                listView.setAdapter(adapter);
+
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                Log.d(TAG, "CANCEELED............");
+                finish();
+            }
+
+        }
+
+
+        TextView destinationtext = (TextView) findViewById(R.id.DestinationText);
+        TextView sourcetext2 = (TextView) findViewById(R.id.sourceText);
+        String fd, sd;
+        if (requestCode == 4) {
+            if (resultCode == Activity.RESULT_OK) {
+
+                Destination_latitude = data.getDoubleExtra("resultDestLat1", 0);
                 Destination_longitude = data.getDoubleExtra("resultDestLon2", 0);
                 fd = data.getStringExtra("fullDestName");
-                fullDestination = "To: "+ fd;
+                fullDestination = "To: " + fd;
                 destinationtext.setText(fullDestination);
 
             }
@@ -181,10 +223,10 @@ public class SourceDestinationUI extends AppCompatActivity {
         }
 
         if (requestCode == 5) {
-            if(resultCode == Activity.RESULT_OK){
+            if (resultCode == Activity.RESULT_OK) {
 
                 sd = data.getStringExtra("result");
-                NewSource = "To: "+ sd;
+                NewSource = "To: " + sd;
                 sourcetext2.setText(NewSource);
 
             }
@@ -192,6 +234,7 @@ public class SourceDestinationUI extends AppCompatActivity {
                 finish();
             }
         }
+
 
     }
 }

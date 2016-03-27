@@ -16,6 +16,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,6 +27,7 @@ import com.iiitd.hammad13060.trackme.Fragments.TrackFragment;
 import com.iiitd.hammad13060.trackme.R;
 import com.iiitd.hammad13060.trackme.SourceDestinationClasses.LoadingScreen;
 import com.iiitd.hammad13060.trackme.helpers.Authentication;
+import com.iiitd.hammad13060.trackme.helpers.Contact;
 import com.iiitd.hammad13060.trackme.services.ContactListUpdateService;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,8 +36,9 @@ public class MainActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
+    public static final String TAG = "MainActivity";
     static final int SELECT_SOURCE_DESTINATION_REQUEST_CODE = 1;
-
+    public static List<Contact> contactList = new ArrayList<>();
     private Fragment journeyFragment = null;
     private Fragment trackFragment = null;
 
@@ -154,7 +157,8 @@ public class MainActivity extends AppCompatActivity {
                 Double Destination_longi = data.getDoubleExtra("DestLongi", 0);
                 Double Source_lat = data.getDoubleExtra("SrcLat",0);
                 Double Source_longi = data.getDoubleExtra("SrcLongi", 0);
-
+                contactList = data.getParcelableArrayListExtra("contList");
+                Log.d(TAG," " + contactList.toString());
                 // The user picked a contact.
                 // The Intent's data Uri identifies which contact was selected.
 

@@ -47,18 +47,6 @@ tools:context="com.iiitd.hammad13060.trackme.SourceDestinationClasses.SourceDest
             android:textSize="10sp"
             />
 
-        <!--TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="From:"
-            android:id="@+id/sourceText"
-            android:layout_below="@+id/source_button"
-            android:layout_alignLeft="@+id/source_button"
-            android:layout_alignStart="@+id/source_button"
-            android:textColor="@color/black"
-            android:paddingLeft="5dp"
-            /!-->
-
         <Button
 
             android:layout_width="match_parent"
@@ -176,6 +164,44 @@ tools:context="com.iiitd.hammad13060.trackme.SourceDestinationClasses.SourceDest
 
     </android.support.v7.widget.CardView>
 
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        card_view:cardBackgroundColor="@color/colorPrimary"
+        android:id="@+id/cardviewContact"
+        android:layout_below="@id/cardview3"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            >
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Select Contacts"
+            android:id="@+id/contact_button"
+            android:gravity="left|center_vertical"
+            android:textColor="#ffffff"
+            android:textSize="10sp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+        <ListView
+            android:id="@+id/listViewContacts"
+            android:layout_below="@+id/contact_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
 
 
 
@@ -199,14 +225,14 @@ tools:context="com.iiitd.hammad13060.trackme.SourceDestinationClasses.SourceDest
         android:layout_marginRight="5dp"/>
 
 
-    <Button
+    <!--Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Select Contacts"
         android:id="@+id/contact_button"
         android:layout_below="@+id/cardview3"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="61dp" />
+        android:layout_marginTop="69dp" /!-->
 
 
 </RelativeLayout>

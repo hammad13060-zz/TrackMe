@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Parcelable;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,12 +19,16 @@ import android.widget.TextView;
 
 import com.iiitd.hammad13060.trackme.R;
 import com.iiitd.hammad13060.trackme.helpers.Constants;
+import com.iiitd.hammad13060.trackme.helpers.Contact;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class LoadingScreen extends AppCompatActivity {
 
     ProgressBar mProgessBar;
-
+    public static List<Contact> finalSelectedContactList = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,6 +110,7 @@ public class LoadingScreen extends AppCompatActivity {
                 Double Destination_longi = data.getDoubleExtra("resultDestLon2", 0);
                 Double Source_lat = data.getDoubleExtra("resultSrcLat1",0);
                 Double Source_longi = data.getDoubleExtra("resultSrcLon2", 0);
+                finalSelectedContactList = data.getParcelableArrayListExtra("contList");
 
                 String l1 = "Destination Lat and Lon : " + Double.toString(Destination_lat)+"\n" + Double.toString((Destination_longi)) + "\nSource "+ Double.toString(Source_lat)+"\n"+Double.toString(Source_longi);
                 tv1.setText(l1);
@@ -116,6 +122,7 @@ public class LoadingScreen extends AppCompatActivity {
                 send_MainFragment.putExtra("SrcLongi",Source_longi);
                 send_MainFragment.putExtra("DestLat",Destination_lat);
                 send_MainFragment.putExtra("DestLongi", Destination_longi);
+                send_MainFragment.putParcelableArrayListExtra("contList", (ArrayList<? extends Parcelable>) finalSelectedContactList);
                 setResult(Activity.RESULT_OK, send_MainFragment);
                 finish();
 
