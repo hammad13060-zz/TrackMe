@@ -7,9 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +22,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,15 +30,13 @@ import android.view.MenuItem;
 //import com.couchbase.lite.Manager;
 import com.iiitd.hammad13060.trackme.BroadCastReceivers.CurrentLocationReceiver;
 import com.iiitd.hammad13060.trackme.Fragments.JourneyFragment;
-import com.iiitd.hammad13060.trackme.Fragments.OneFragment;
 import com.iiitd.hammad13060.trackme.Fragments.TrackFragment;
 import com.iiitd.hammad13060.trackme.Fragments.TwoFragment;
 import com.iiitd.hammad13060.trackme.MyLocationInterface;
 import com.iiitd.hammad13060.trackme.R;
-import com.iiitd.hammad13060.trackme.SourceDestinationClasses.Source;
-import com.iiitd.hammad13060.trackme.SourceDestinationClasses.Source_Dst;
+import com.iiitd.hammad13060.trackme.SourceDestinationClasses.LoadingScreen;
 import com.iiitd.hammad13060.trackme.helpers.Authentication;
-import com.iiitd.hammad13060.trackme.helpers.Constants;
+import com.iiitd.hammad13060.trackme.helpers.Contact;
 import com.iiitd.hammad13060.trackme.services.ContactListUpdateService;
 import com.iiitd.hammad13060.trackme.services.JourneyService;
 
@@ -47,8 +46,9 @@ public class MainActivity extends AppCompatActivity implements MyLocationInterfa
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
+    public static final String TAG = "MainActivity";
     static final int SELECT_SOURCE_DESTINATION_REQUEST_CODE = 1;
-
+    public static List<Contact> contactList = new ArrayList<>();
     private Fragment journeyFragment = null;
     private Fragment trackFragment = null;
 
@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements MyLocationInterfa
             public void onClick(View view) {
                 //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                    //     .setAction("Action", null).show();
-                Intent i = new Intent(MainActivity.this,Source_Dst.class);
+                Intent i = new Intent(MainActivity.this,LoadingScreen.class);
                 startActivityForResult(i, SELECT_SOURCE_DESTINATION_REQUEST_CODE);
             }
         });
@@ -185,7 +185,8 @@ public class MainActivity extends AppCompatActivity implements MyLocationInterfa
                 Double Destination_longi = data.getDoubleExtra("DestLongi", 0);
                 Double Source_lat = data.getDoubleExtra("SrcLat",0);
                 Double Source_longi = data.getDoubleExtra("SrcLongi", 0);
-
+                contactList = data.getParcelableArrayListExtra("contList");
+                Log.d(TAG," " + contactList.toString());
                 // The user picked a contact.
                 // The Intent's data Uri identifies which contact was selected.
 

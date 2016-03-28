@@ -6,8 +6,9 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.iiitd.hammad13060.trackme.helpers.Constants;
+import com.iiitd.hammad13060.trackme.helpers.Contact;
 
 import android.Manifest;
 import android.app.Activity;
@@ -17,12 +18,13 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Source extends Activity implements ConnectionCallbacks,
         OnConnectionFailedListener {
@@ -30,7 +32,7 @@ public class Source extends Activity implements ConnectionCallbacks,
     private static final String TAG = "-- Source Class --";
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
-
+    public static List<Contact> selectedContactList = new ArrayList<>();
     private Location mLastLocation;
     private GoogleApiClient mGoogleApiClient;
 
@@ -66,7 +68,7 @@ public class Source extends Activity implements ConnectionCallbacks,
             returnIntent.putExtra("result2",longitude);
             setResult(Activity.RESULT_OK, returnIntent);
             finish();*/
-            LocationAddress locationAddress = new LocationAddress();
+            ReverseGeocoding locationAddress = new ReverseGeocoding();
             locationAddress.getAddressFromLocation(Source_latitude, Source_longitude,
                     getApplicationContext(), new GeocoderHandler());
 
@@ -117,7 +119,9 @@ public class Source extends Activity implements ConnectionCallbacks,
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
+
         Log.i(TAG, "Connection failed:");
+        Constants.showLongToast(getApplicationContext(), "ConnectionFailed");
     }
 
     @Override
@@ -145,15 +149,24 @@ public class Source extends Activity implements ConnectionCallbacks,
                     locationAddress = null;
             }
             //tvAddress.setText(locationAddress);
-            sendToDestination(locationAddress);
+            if(locationAddress!=null)
+            {
+                sendToDestination(locationAddress);
+            }
+            else
+            {
+                displayLocation();
+            }
+
         }
     }
 
     void sendToDestination(String la)
     {
-        Intent i = new Intent(this, MyDestination.class);
-        i.putExtra("sourceText",la);
+        Intent i = new Intent(this, SourceDestinationUI.class);
+        i.putExtra("sourceText", la);
         startActivityForResult(i, 3);
+
     }
 
     @Override
@@ -164,19 +177,19 @@ public class Source extends Activity implements ConnectionCallbacks,
                 //String result=data.getStringExtra("result");
                 Double Destination_latitude = data.getDoubleExtra("resultDestLat1",0);
                 Double Destination_longitude = data.getDoubleExtra("resultDestLon2", 0);
-
-
+                selectedContactList = data.getParcelableArrayListExtra("contList");
                 //returnIntent.putExtra("result",result);
                 returnIntent_source.putExtra("resultSrcLat1",Source_latitude);
                 returnIntent_source.putExtra("resultSrcLon2",Source_longitude);
                 returnIntent_source.putExtra("resultDestLat1",Destination_latitude);
                 returnIntent_source.putExtra("resultDestLon2", Destination_longitude);
+                returnIntent_source.putParcelableArrayListExtra("contList", (ArrayList<? extends Parcelable>) selectedContactList);
                 setResult(Activity.RESULT_OK, returnIntent_source);
                 finish();
 
             }
             if (resultCode == Activity.RESULT_CANCELED) {
-
+                finish();
             }
         }
     }

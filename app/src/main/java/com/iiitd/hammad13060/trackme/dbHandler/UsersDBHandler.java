@@ -26,11 +26,13 @@ public class UsersDBHandler {
     private DB usersDB = null;
 
 
+
     public UsersDBHandler(Context context) {
         try {
             this.usersDB = DBFactory.open(context);
         } catch (SnappydbException e) {
             this.usersDB = null;
+            Log.d(TAG, "cannot initiate userdb: " + e.toString());
             e.printStackTrace();
         }
     }
@@ -61,6 +63,7 @@ public class UsersDBHandler {
                 for (int i = 0;i < numberArray.length(); i++) {
                     Contact contact = Contact.jsonToContact(numberArray.getJSONObject(i));
                     contactList.add(contact);
+
                 }
 
             } catch (SnappydbException e) {
@@ -69,9 +72,27 @@ public class UsersDBHandler {
                 e.printStackTrace();
             }
         }
-
+        Log.d(TAG, "//////      HAMMAAD ADD NHI HUA KYA KARE       ////////////// " + contactList.toString());
         return contactList;
     }
+
+
+
+    //Fake List
+    /*public List<Contact> getUsers()
+    {
+
+        List<Contact> users = new ArrayList<>();
+
+        users.add(new Contact(11,"Pushkin"));
+        users.add(new Contact(12,"Yas"));
+        users.add(new Contact(13,"KAhsj"));
+        users.add(new Contact(14,"Lot"));
+        users.add(new Contact(15,"Got"));
+        return users;
+    }*/
+
+
 
     public void closeDB() {
         try {

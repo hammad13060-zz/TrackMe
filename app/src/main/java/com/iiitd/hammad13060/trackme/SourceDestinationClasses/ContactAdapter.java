@@ -3,89 +3,85 @@ package com.iiitd.hammad13060.trackme.SourceDestinationClasses;
 /**
  * Created by Pushkin on 02-Feb-16.
  */
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.iiitd.hammad13060.trackme.R;
+import com.iiitd.hammad13060.trackme.helpers.Contact;
 
-class ContactNumber {
 
-    String name;
+public class ContactAdapter extends ArrayAdapter<Contact>{
 
-    boolean selected = false;
+    SparseBooleanArray checkContacts;
+    int layoutResourceId;
+    public static List<Contact> contList;
 
-    public ContactNumber(String name) {
-        super();
-        this.name = name;
+    public ContactAdapter(Context context, List<Contact> users) {
+        super(context, 0, users);
+        contList = users;
     }
 
-    public String getName() {
-        return name;
+    @Override
+    public int getCount() {
+        return contList.size();
     }
 
-    public void setName(String name) {
-        this.name = name;
+    @Override
+    public Contact getItem(int position) {
+        return contList.get(position);
     }
 
-
-    public boolean isSelected() {
-        return selected;
-    }
-
-    public void setSelected(boolean selected) {
-        this.selected = selected;
-    }
-}
-
-public class ContactAdapter extends ArrayAdapter<ContactNumber>{
-
-    private List<ContactNumber> contactList;
-    private Context context;
-
-    public ContactAdapter(List<ContactNumber> contactList, Context context) {
-        super(context, R.layout.list_view, contactList);
-        this.contactList = contactList;
-        this.context = context;
-    }
-
-    private static class ContactHolder {
-        public TextView contactName;
-        public CheckBox chkBox;
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
-        View v = convertView;
-
-        ContactHolder holder = new ContactHolder();
-
-        if(convertView == null) {
-
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = inflater.inflate(R.layout.list_view, null);
-
-            holder.contactName = (TextView) v.findViewById(R.id.name);
-            holder.chkBox = (CheckBox) v.findViewById(R.id.chk_box);
-
-            holder.chkBox.setOnCheckedChangeListener((SelectContacts) context);
-
-        } else {
-            holder = (ContactHolder) v.getTag();
+        Contact user = getContact(position);
+        if (convertView == null) {
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_view, parent, false);
         }
+        TextView tvName = (TextView) convertView.findViewById(R.id.name);
+        CheckBox chk = (CheckBox) convertView.findViewById(R.id.chk_box);
+        tvName.setText(user.name);
+        chk.setOnCheckedChangeListener(myCheckChangList);
+        chk.setTag(position);
+        chk.setChecked(user.box);
 
-        ContactNumber p = contactList.get(position);
-        holder.contactName.setText(p.getName());
-        holder.chkBox.setChecked(p.isSelected());
-        holder.chkBox.setTag(p);
-
-        return v;
+        return convertView;
     }
+
+    Contact getContact(int position)
+    {
+        return ((Contact) getItem(position));
+    }
+
+    static List<Contact> getBox() {
+        List<Contact> box = new ArrayList<>();
+        for (Contact p : contList) {
+            if (p.box)
+                box.add(p);
+        }
+        return box;
+    }
+
+    CompoundButton.OnCheckedChangeListener myCheckChangList = new CompoundButton.OnCheckedChangeListener() {
+        public void onCheckedChanged(CompoundButton buttonView,
+                                     boolean isChecked) {
+            getContact((Integer) buttonView.getTag()).box = isChecked;
+
+        }
+    };
 }
