@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.iiitd.hammad13060.trackme.JourneyReadyInterface;
+import com.iiitd.hammad13060.trackme.Interfaces.JourneyReadyInterface;
 
 public class JourneyReadyReceiver extends BroadcastReceiver {
 

@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.iiitd.hammad13060.trackme.MyLocationInterface;
+import com.iiitd.hammad13060.trackme.Interfaces.MyLocationInterface;
 import com.iiitd.hammad13060.trackme.helpers.MyLocation;
 
 public class CurrentLocationReceiver extends BroadcastReceiver {

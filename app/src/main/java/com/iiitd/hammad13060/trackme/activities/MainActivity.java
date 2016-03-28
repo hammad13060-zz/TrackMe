@@ -1,18 +1,17 @@
 package com.iiitd.hammad13060.trackme.activities;
 
 
-import android.app.FragmentTransaction;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
-import android.content.Intent;
-import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -31,24 +30,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 //import com.couchbase.lite.Manager;
-import com.iiitd.hammad13060.trackme.BroadCastReceivers.CurrentLocationReceiver;
+import com.iiitd.hammad13060.trackme.BroadCastReceivers.DestinationReachedReceiver;
 import com.iiitd.hammad13060.trackme.BroadCastReceivers.JourneyReadyReceiver;
 import com.iiitd.hammad13060.trackme.Fragments.ArchivedFragment;
 import com.iiitd.hammad13060.trackme.Fragments.JourneyFragment;
-import com.iiitd.hammad13060.trackme.Fragments.OneFragment;
 import com.iiitd.hammad13060.trackme.Fragments.TrackFragment;
-import com.iiitd.hammad13060.trackme.Fragments.TwoFragment;
-import com.iiitd.hammad13060.trackme.JourneyReadyInterface;
-import com.iiitd.hammad13060.trackme.MyLocationInterface;
+import com.iiitd.hammad13060.trackme.Interfaces.JourneyReadyInterface;
 import com.iiitd.hammad13060.trackme.R;
-import com.iiitd.hammad13060.trackme.SourceDestinationClasses.Source;
 import com.iiitd.hammad13060.trackme.SourceDestinationClasses.Source_Dst;
-import com.iiitd.hammad13060.trackme.cloudeMessaging.MyGcmListenerService;
-import com.iiitd.hammad13060.trackme.cloudeMessaging.MyInstanceIDListenerService;
-import com.iiitd.hammad13060.trackme.helpers.Authentication;
 import com.iiitd.hammad13060.trackme.helpers.Constants;
 import com.iiitd.hammad13060.trackme.helpers.Contact;
-import com.iiitd.hammad13060.trackme.services.ContactListUpdateService;
 import com.iiitd.hammad13060.trackme.services.JourneyService;
 
 public class MainActivity extends AppCompatActivity implements JourneyReadyInterface {
@@ -73,6 +64,8 @@ public class MainActivity extends AppCompatActivity implements JourneyReadyInter
     private BroadcastReceiver journeyReadyReciever = null;
 
     ViewPagerAdapter adapter;
+
+    private DialogFragment stopJourneyDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,8 +94,13 @@ public class MainActivity extends AppCompatActivity implements JourneyReadyInter
             public void onClick(View view) {
                 //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                    //     .setAction("Action", null).show();
-                Intent i = new Intent(MainActivity.this,Source_Dst.class);
-                startActivityForResult(i, SELECT_SOURCE_DESTINATION_REQUEST_CODE);
+                if (!JourneyService.journeyRunning) {
+                    Intent i = new Intent(MainActivity.this, Source_Dst.class);
+                    startActivityForResult(i, SELECT_SOURCE_DESTINATION_REQUEST_CODE);
+                } else {
+                    createStopJourneyDialog();
+                    stopJourneyDialog.show(getSupportFragmentManager(), "dialog_for_force_stopping_current_journey");
+                }
             }
         });
     }
@@ -257,5 +255,30 @@ public class MainActivity extends AppCompatActivity implements JourneyReadyInter
         Parcelable[] p = {contact};
 
         return p;
+    }
+
+    private void createStopJourneyDialog() {
+        stopJourneyDialog = new DialogFragment(){
+            @Override
+            public Dialog onCreateDialog(Bundle savedInstanceState) {
+                // Use the Builder class for convenient dialog construction
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setMessage("Do you want to stop your current journey")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // user wants to stop his current journey
+                                Intent intent = new Intent(DestinationReachedReceiver.DESTINATION_REACHED_FILTER_TAG);
+                                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // User cancelled the dialog
+                            }
+                        });
+                // Create the AlertDialog object and return it
+                return builder.create();
+            }
+        };
     }
 }

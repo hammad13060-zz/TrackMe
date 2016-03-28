@@ -1,6 +1,5 @@
 package com.iiitd.hammad13060.trackme.Fragments;
 
-import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,15 +8,14 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.cocoahero.android.geojson.GeoJSON;
-import com.cocoahero.android.geojson.GeoJSONObject;
-import com.google.android.gms.location.places.GeoDataApi;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -25,15 +23,10 @@ import com.google.android.gms.maps.StreetViewPanorama;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolygonOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.maps.android.PolyUtil;
 import com.google.maps.android.geojson.GeoJsonLayer;
 import com.iiitd.hammad13060.trackme.BroadCastReceivers.CurrentLocationReceiver;
-import com.iiitd.hammad13060.trackme.BroadCastReceivers.JourneyReadyReceiver;
-import com.iiitd.hammad13060.trackme.JourneyReadyInterface;
-import com.iiitd.hammad13060.trackme.MyLocationInterface;
+import com.iiitd.hammad13060.trackme.Interfaces.MyLocationInterface;
 import com.iiitd.hammad13060.trackme.R;
 import com.iiitd.hammad13060.trackme.services.JourneyService;
 
@@ -76,6 +69,7 @@ public class JourneyFragment extends Fragment implements MyLocationInterface {
     private OnMapReadyCallback onMapReadyCallback = null;
     private BroadcastReceiver currentLocationReceiver = null;
     private BroadcastReceiver journeyReadyReciever = null;
+    private BroadcastReceiver journeyFinishedReceiver = null;
     private boolean mapReady = false;
 
     private GoogleMap map = null;
@@ -90,6 +84,8 @@ public class JourneyFragment extends Fragment implements MyLocationInterface {
     private String destination_text;
     private String duration_text;
     private String distance_text;
+
+    private static View myView;
 
     public JourneyFragment() {
         // Required empty public constructor
@@ -126,8 +122,15 @@ public class JourneyFragment extends Fragment implements MyLocationInterface {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        if (JourneyService.journeyRunning) return inflater.inflate(R.layout.fragment_journey_map, container, false);
-        else return inflater.inflate(R.layout.fragment_journey, container, false);
+        try {
+            View tmpView;
+            if (JourneyService.journeyRunning) tmpView = inflater.inflate(R.layout.fragment_journey_map, container, false);
+            else tmpView = inflater.inflate(R.layout.fragment_journey, container, false);
+            myView = tmpView;
+        } catch(InflateException e) {
+            Log.d(TAG, "layout already inflated");
+        }
+        return myView;
     }
 
     @Override
@@ -140,11 +143,12 @@ public class JourneyFragment extends Fragment implements MyLocationInterface {
         super.onResume();
         if (JourneyService.journeyRunning) {
             mapReady = false;
-            registerMyLocationReceiver();
             initJourneyDisplayInfo();
             setJourneyDataOnUI();
             setMap();
         }
+        registerMyLocationReceiver();
+        registerJourneyFinishedReceiver();
     }
 
     @Override
@@ -155,9 +159,8 @@ public class JourneyFragment extends Fragment implements MyLocationInterface {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (JourneyService.journeyRunning) {
-            unregisterMyLocationReceiver();
-        }
+        unregisterMyLocationReceiver();
+        unregisterJourneyFinishedReceiver();
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -203,11 +206,15 @@ public class JourneyFragment extends Fragment implements MyLocationInterface {
     public void resetJourney(Intent intent) {
         try {
             directions = new JSONObject(intent.getStringExtra(JourneyService.EXTRA_DIRECTIONS));
-            android.support.v4.app.FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-            fragmentManager.beginTransaction().detach(this).attach(this).commit();
+            reinitFragment();
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private void reinitFragment() {
+        android.support.v4.app.FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager.beginTransaction().detach(this).attach(this).commit();
     }
 
     public void setMap() {
@@ -238,13 +245,19 @@ public class JourneyFragment extends Fragment implements MyLocationInterface {
     }
 
     private void registerMyLocationReceiver() {
-        currentLocationReceiver = new CurrentLocationReceiver(this);
-        IntentFilter intentFilter = new IntentFilter("com.iiitd.hammad13060.trackme.BroadCastReceivers.CurrentLocationReceiver");
-        getActivity().registerReceiver(currentLocationReceiver, intentFilter);
+        if (currentLocationReceiver == null) {
+            currentLocationReceiver = new CurrentLocationReceiver(this);
+            IntentFilter intentFilter = new IntentFilter("com.iiitd.hammad13060.trackme.BroadCastReceivers.CurrentLocationReceiver");
+            getActivity().registerReceiver(currentLocationReceiver, intentFilter);
+        }
     }
 
     private void unregisterMyLocationReceiver() {
-        getActivity().unregisterReceiver(currentLocationReceiver);
+        if (currentLocationReceiver != null) {
+            getActivity().unregisterReceiver(currentLocationReceiver);
+            currentLocationReceiver = null;
+        }
+
     }
 
     @Override
@@ -322,6 +335,32 @@ public class JourneyFragment extends Fragment implements MyLocationInterface {
 
         view = (TextView)getView().findViewById(R.id.duration_text);
         view.setText(duration_text);
+    }
+
+    /////////////////////////////////////registering journey finished receiver /////////////////////////////////
+
+    private void initJourneyFinishedReceiver() {
+        journeyFinishedReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                reinitFragment();
+            }
+        };
+    }
+
+    private void registerJourneyFinishedReceiver() {
+        if (journeyFinishedReceiver == null) {
+            initJourneyFinishedReceiver();
+            IntentFilter filter = new IntentFilter(JourneyService.JOURNEY_COMPLETE_BROADCAST_TAG);
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(journeyFinishedReceiver,filter);
+        }
+    }
+
+    private void unregisterJourneyFinishedReceiver() {
+        if (journeyFinishedReceiver != null) {
+            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(journeyFinishedReceiver);
+            journeyFinishedReceiver = null;
+        }
     }
 
 }

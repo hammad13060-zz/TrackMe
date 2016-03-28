@@ -65,7 +65,7 @@ public class JourneyListAdapter extends BaseAdapter {
         TextView journeyTitleTextView = (TextView) convertView.findViewById(R.id.journey_title_text_view);
 
         Journey journey = journeyList.get(position);
-        String journey_title = journey.get_from(); //getJourneyTitle(journey);
+        String journey_title = /*journey.get_from();*/ getJourneyTitle(journey);
 
 
         journey.setTitle(journey_title);

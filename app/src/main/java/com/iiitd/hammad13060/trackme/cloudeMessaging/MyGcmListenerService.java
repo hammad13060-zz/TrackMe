@@ -103,7 +103,7 @@ public class MyGcmListenerService extends GcmListenerService {
 
             Journey journey = new Journey(
                     topic,
-                    from,
+                    _from,
                     current_lat,
                     current_long
             );
@@ -118,7 +118,9 @@ public class MyGcmListenerService extends GcmListenerService {
             JourneyDBHandler dbHandler = new JourneyDBHandler(this, null, null, 1);
 
             //bug from
-            Journey journey = dbHandler.deleteJourney(from);
+            //String _from = data.getString(_FROM);
+            String _journey_topic = data.getString(_JOURNEY_TOPIC);
+            Journey journey = dbHandler.deleteJourney(_JOURNEY_TOPIC);
 
             ArchivedDBHandler archivedDBHandler = new ArchivedDBHandler(this, null, null, 1);
             archivedDBHandler.insertJourney(journey);

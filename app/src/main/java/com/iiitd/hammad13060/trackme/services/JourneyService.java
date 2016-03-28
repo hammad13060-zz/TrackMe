@@ -6,8 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Parcelable;
 import android.support.v4.content.LocalBroadcastManager;
@@ -18,10 +18,15 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.iiitd.hammad13060.trackme.BroadCastReceivers.CurrentLocationReceiver;
+import com.iiitd.hammad13060.trackme.BroadCastReceivers.DestinationReachedReceiver;
 import com.iiitd.hammad13060.trackme.BroadCastReceivers.JourneyReadyReceiver;
-import com.iiitd.hammad13060.trackme.Fragments.JourneyFragment;
-import com.iiitd.hammad13060.trackme.MyLocationInterface;
+import com.iiitd.hammad13060.trackme.Geofencing.Geofencing;
+import com.iiitd.hammad13060.trackme.Interfaces.DestinationReachedInterface;
+import com.iiitd.hammad13060.trackme.Interfaces.MyLocationInterface;
 import com.iiitd.hammad13060.trackme.activities.MainActivity;
 import com.iiitd.hammad13060.trackme.helpers.Authentication;
 import com.iiitd.hammad13060.trackme.helpers.Constants;
@@ -29,8 +34,6 @@ import com.iiitd.hammad13060.trackme.helpers.Contact;
 import com.iiitd.hammad13060.trackme.helpers.JSONRequest;
 import com.iiitd.hammad13060.trackme.helpers.MyLocation;
 import com.iiitd.hammad13060.trackme.services.journeyServiceHelper.JourneyConstants;
-import com.iiitd.hammad13060.trackme.services.journeyServiceHelper.JourneyNotificationToContacts;
-import com.iiitd.hammad13060.trackme.services.journeyServiceHelper.NotifyContactsTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,12 +42,14 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JourneyService extends Service implements MyLocationInterface {
+public class JourneyService extends Service implements MyLocationInterface, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, DestinationReachedInterface {
 
     private static final String TAG = "JourneyService";
     private static final String WEB_URL = Constants.SERVER_URL + "getDirections/";
 
     public static final String EXTRA_DIRECTIONS = "com.iiitd.hammad13060.trackme.services.EXTRA_DIRECTIONS";
+
+    public static final String JOURNEY_COMPLETE_BROADCAST_TAG = "com.iiitd.hammad13060.trackme.services.JOURNEY_COMPLETE_BROADCST TAG";
 
     private static double SrctLat;
     private static double SrcLong;
@@ -60,8 +65,16 @@ public class JourneyService extends Service implements MyLocationInterface {
 
     private BroadcastReceiver currentLocationReceiver = null;
     private BroadcastReceiver peopleNotifiedReceiver = null;
+    private BroadcastReceiver destinationReachedReceiver = null;
 
     private MyLocation myLocation;
+
+    private GoogleApiClient mGoogleApiClient;
+
+    private Geofencing mGeofencing;
+
+    private boolean msg_destination_reached;
+    private boolean msg_destination_reached_sent;
 
 
     MyLocationInterface myLocationInterface = null;
@@ -79,10 +92,8 @@ public class JourneyService extends Service implements MyLocationInterface {
         super.onCreate();
         registerMyLocationReceiver();
         registerPeopleNotifiedReceiver();
+        registerDestinationReachedReceiver();
         myLocation = new MyLocation(getApplicationContext());
-        /*Location currentLocation = myLocation.getMyCurrentLocation();
-        currentLat = currentLocation.getLatitude();
-        currentLong = currentLocation.getLongitude();*/
     }
 
     @Override
@@ -93,30 +104,22 @@ public class JourneyService extends Service implements MyLocationInterface {
 
             Log.d(TAG, intent.toString());
 
-        SrctLat = intent.getDoubleExtra(MainActivity.EXTRA_SRC_LAT, 0);
-        SrcLong = intent.getDoubleExtra(MainActivity.EXTRA_SRC_LONG, 0);
-        DestLat = intent.getDoubleExtra(MainActivity.EXTRA_DST_LAT, 0);
-        DestLong = intent.getDoubleExtra(MainActivity.EXTRA_DST_LONG, 0);
+            SrctLat = intent.getDoubleExtra(MainActivity.EXTRA_SRC_LAT, 0);
+            SrcLong = intent.getDoubleExtra(MainActivity.EXTRA_SRC_LONG, 0);
+            DestLat = intent.getDoubleExtra(MainActivity.EXTRA_DST_LAT, 0);
+            DestLong = intent.getDoubleExtra(MainActivity.EXTRA_DST_LONG, 0);
 
-        //dummy
-        Parcelable[] parcelables = intent.getParcelableArrayExtra(MainActivity.EXTRA_CONTACT_LIST);
-        contactList = new ArrayList<>();
-        for (int i = 0; i < parcelables.length; i++)
-            contactList.add((Contact)parcelables[i]);
+            //dummy
+            Parcelable[] parcelables = intent.getParcelableArrayExtra(MainActivity.EXTRA_CONTACT_LIST);
+            contactList = new ArrayList<>();
+            for (int i = 0; i < parcelables.length; i++)
+                contactList.add((Contact) parcelables[i]);
 
-        currentLat = SrctLat;
-        currentLong = SrcLong;
+            currentLat = SrctLat;
+            currentLong = SrcLong;
 
-        try {
-            notifyContacts();
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.d(TAG, "Not able to notify contacts");
-        }
-
-        journeyRunning = true;
-
-        getDirections();
+            initGoogleApiClient();
+            mGoogleApiClient.connect();
         }
 
 
@@ -127,8 +130,13 @@ public class JourneyService extends Service implements MyLocationInterface {
     public void onDestroy() {
         super.onDestroy();
         journeyRunning = false;
+        sendJourneyFinishedBroadcast();
         unregisterMyLocationReceiver();
         unregisterPeopleNotifiedReceiver();
+        unregisterDestinationReachedReceiver();
+        mGeofencing.stopGeofencing();
+        mGoogleApiClient.disconnect();
+        myLocation.tearDown();
     }
 
     @Override
@@ -152,7 +160,7 @@ public class JourneyService extends Service implements MyLocationInterface {
         broadCastIntent.putExtra(MainActivity.EXTRA_SRC_LAT, SrctLat);
         broadCastIntent.putExtra(MainActivity.EXTRA_SRC_LONG, SrcLong);
         broadCastIntent.putExtra(MainActivity.EXTRA_DST_LAT, DestLat);
-        broadCastIntent.putExtra(MainActivity.EXTRA_DST_LONG,DestLong);
+        broadCastIntent.putExtra(MainActivity.EXTRA_DST_LONG, DestLong);
         broadCastIntent.putExtra(MyLocation.EXTRA_MY_LAT, currentLat);
         broadCastIntent.putExtra(MyLocation.EXTRA_MY_LONG, currentLong);
         broadCastIntent.setAction(JourneyReadyReceiver.ACTION_VALUE);
@@ -217,6 +225,9 @@ public class JourneyService extends Service implements MyLocationInterface {
     public static double getCurrentLong() {
         return currentLong;
     }
+
+
+
 
     private class GetDirectionsTask extends AsyncTask<JSONObject, Void, Void> {
 
@@ -289,6 +300,8 @@ public class JourneyService extends Service implements MyLocationInterface {
     ///////////////////////////////////////notifying people/////////////////////////////////////////
 
     private void notifyContacts() throws JSONException {
+        msg_destination_reached = false;
+        msg_destination_reached_sent = false;
         JSONArray _numbers = new JSONArray();
 
         SharedPreferences token_file = getSharedPreferences(Constants.PREFERENCE_TOKEN_FILE, Context.MODE_PRIVATE);
@@ -456,6 +469,11 @@ public class JourneyService extends Service implements MyLocationInterface {
 
         String update_type = JourneyConstants.UPDATE_TYPE_LOCATION;
 
+        if (msg_destination_reached) {
+            update_type = JourneyConstants.UPDATE_TYPE_TERMINATION;
+            msg_destination_reached_sent = true;
+        }
+
         JSONObject requestObject = new JSONObject();
 
         try {
@@ -500,7 +518,12 @@ public class JourneyService extends Service implements MyLocationInterface {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                sendPeopleNotifiedBroadcast();
+                if (msg_destination_reached && msg_destination_reached_sent) {
+                    //broadcasts for finishing journey and other killing tasks
+                    stopSelf();
+                } else {
+                    sendPeopleNotifiedBroadcast();
+                }
                 requestQueue.stop();
             }
         };
@@ -509,15 +532,92 @@ public class JourneyService extends Service implements MyLocationInterface {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d(TAG, "not able to reach server");
-                sendPeopleNotifiedBroadcast();
+                if (msg_destination_reached && msg_destination_reached_sent) {
+                    stopSelf();
+                } else {
+                    sendPeopleNotifiedBroadcast();
+                }
+
                 requestQueue.stop();
             }
         };
 
         requestQueue = Volley.newRequestQueue(getApplicationContext());
 
+
         JSONRequest jsonRequest = new JSONRequest(Request.Method.POST, Constants.SERVER_URL + "pubsub/updateTopic", null,
                 responseListener, errorListener, request);
         requestQueue.add(jsonRequest);
+
+    }
+
+    //////////////////////////////////////////////////////google api client ///////////////////////////////////
+    private void initGoogleApiClient() {
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        Log.d(TAG, "connection established with google api client");
+        try {
+            notifyContacts();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.d(TAG, "Not able to notify contacts");
+        }
+
+        journeyRunning = true;
+
+        getDirections();
+
+        mGeofencing = new Geofencing(getApplicationContext(), mGoogleApiClient, DestLat, DestLong);
+        mGeofencing.startGeofencing();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.d(TAG, "connection suspended with google api client");
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.d(TAG, "failed to establish connection with google api client");
+    }
+
+    private void initDestinationReachedReceiver() {
+        destinationReachedReceiver = new DestinationReachedReceiver(this);
+    }
+
+    @Override
+    public void onDestinationReached(Intent intent) {
+        msg_destination_reached = true;
+    }
+
+    /////////////////////////send journey finished broadcast /////////////////////////////////
+
+    private void registerDestinationReachedReceiver() {
+        if (destinationReachedReceiver == null) {
+            destinationReachedReceiver = new DestinationReachedReceiver(this);
+            IntentFilter filter = new IntentFilter(DestinationReachedReceiver.DESTINATION_REACHED_FILTER_TAG);
+            LocalBroadcastManager.getInstance(this).registerReceiver(destinationReachedReceiver, filter);
+        }
+    }
+
+    private void unregisterDestinationReachedReceiver() {
+        if (destinationReachedReceiver != null) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(destinationReachedReceiver);
+            destinationReachedReceiver = null;
+        }
+    }
+
+    private void sendJourneyFinishedBroadcast() {
+        Intent intent = new Intent(JOURNEY_COMPLETE_BROADCAST_TAG);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 }

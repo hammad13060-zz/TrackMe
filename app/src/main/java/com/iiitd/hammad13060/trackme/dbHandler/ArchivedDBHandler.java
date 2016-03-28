@@ -20,7 +20,7 @@ public class ArchivedDBHandler extends SQLiteOpenHelper {
 
     private Context context = null;
 
-    private static final int DATABASE_VERSION = 8;
+    private static final int DATABASE_VERSION = 9;
     private static final String DATABASE_NAME = "archivedJourney.db";
     private static final String TABLE_JOURNEY = "archivedJourneys";
 
@@ -99,6 +99,7 @@ public class ArchivedDBHandler extends SQLiteOpenHelper {
         while(!c.isAfterLast()) {
             Journey journey = cursorToJourney(c);
             journeyList.add(journey);
+            c.moveToNext();
         }
 
         return journeyList;
@@ -141,13 +142,11 @@ public class ArchivedDBHandler extends SQLiteOpenHelper {
                 c.getString(c.getColumnIndex(COLUMN_JOURNEY_TOPIC)),
                 c.getString(c.getColumnIndex(COLUMN_FROM)),
                 c.getDouble(c.getColumnIndex(COLUMN_SRC_LAT)),
-                c.getDouble(c.getColumnIndex(COLUMN_SRC_LAT)),
-                c.getDouble(c.getColumnIndex(COLUMN_SRC_LAT)),
-                c.getDouble(c.getColumnIndex(COLUMN_SRC_LAT)),
-                c.getDouble(c.getColumnIndex(COLUMN_SRC_LAT)),
-                c.getDouble(c.getColumnIndex(COLUMN_SRC_LAT))
-
-
+                c.getDouble(c.getColumnIndex(COLUMN_SRC_LONG)),
+                c.getDouble(c.getColumnIndex(COLUMN_DST_LAT)),
+                c.getDouble(c.getColumnIndex(COLUMN_DST_LONG)),
+                c.getDouble(c.getColumnIndex(COLUMN_CURRENT_LAT)),
+                c.getDouble(c.getColumnIndex(COLUMN_CURRENT_LONG))
         );
     }
 }

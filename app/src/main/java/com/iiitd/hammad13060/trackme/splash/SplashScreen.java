@@ -16,6 +16,8 @@ import android.view.View;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.iiitd.hammad13060.trackme.BroadCastReceivers.ContactListUpdatedReceiver;
+import com.iiitd.hammad13060.trackme.Interfaces.ContactListUpdatedInterface;
 import com.iiitd.hammad13060.trackme.R;
 import com.iiitd.hammad13060.trackme.activities.MainActivity;
 import com.iiitd.hammad13060.trackme.activities.RegistrationActivity;
@@ -23,29 +25,31 @@ import com.iiitd.hammad13060.trackme.cloudeMessaging.QuickstartPreferences;
 import com.iiitd.hammad13060.trackme.cloudeMessaging.RegistrationIntentService;
 import com.iiitd.hammad13060.trackme.helpers.Authentication;
 import com.iiitd.hammad13060.trackme.helpers.Constants;
+import com.iiitd.hammad13060.trackme.services.ContactListUpdateIntentService;
 import com.iiitd.hammad13060.trackme.services.ContactListUpdateService;
 
-public class SplashScreen extends AppCompatActivity {
+public class SplashScreen extends AppCompatActivity implements ContactListUpdatedInterface {
 
     private static final String TAG = "SplashScreen";
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     private BroadcastReceiver gcmRegistrationReciever = null;
+    private BroadcastReceiver contactListUpdatedReceiver = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
 
-        Intent contactListUpdateServiceIntent = new Intent(getApplicationContext(), ContactListUpdateService.class);
+        //Intent contactListUpdateServiceIntent = new Intent(getApplicationContext(), ContactListUpdateService.class);
 
         if (checkPlayServices()) {
             if (!Authentication.hasAccess(getApplicationContext())) {
                 enterRegistrationActivity();
-                stopService(contactListUpdateServiceIntent); //stopping service contact List Update Service
+                //stopService(contactListUpdateServiceIntent); //stopping service contact List Update Service
             } else {
-                    startService(contactListUpdateServiceIntent);
+                    //startService(contactListUpdateServiceIntent);
                     Intent intent = new Intent(this, RegistrationIntentService.class);
                     startService(intent);
             }
@@ -58,12 +62,14 @@ public class SplashScreen extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         registerGCMReceiver();
+        registerContactListUpdatedReceiver();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         unRegisterGCMReceiver();
+        unregisterContactListUpdatedReceiver();
     }
 
     private boolean checkPlayServices() {
@@ -113,7 +119,8 @@ public class SplashScreen extends AppCompatActivity {
                 boolean sentToken = sharedPreferences
                         .getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
                 if (sentToken) {
-                    enterMainActivity();
+                    //enterMainActivity();
+                    fetchContacts();
                 } else {
                     Constants.showLongToast(getApplicationContext(), "couldn't register for push notification service\n" +
                             "Check your network connection");
@@ -129,4 +136,27 @@ public class SplashScreen extends AppCompatActivity {
         finish();
     }
 
+    private void fetchContacts() {
+        Intent intent = new Intent(this, ContactListUpdateIntentService.class);
+        startService(intent);
+    }
+
+    private void registerContactListUpdatedReceiver() {
+        if (contactListUpdatedReceiver == null) {
+            contactListUpdatedReceiver = new ContactListUpdatedReceiver(this);
+            IntentFilter intent = new IntentFilter(ContactListUpdatedReceiver.CONTACT_LIST_UPDATED_RECEIVER_TAG);
+            LocalBroadcastManager.getInstance(this).registerReceiver(contactListUpdatedReceiver, intent);
+        }
+    }
+
+    private void unregisterContactListUpdatedReceiver() {
+        if (contactListUpdatedReceiver != null) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(contactListUpdatedReceiver);
+        }
+    }
+
+    @Override
+    public void onContactListUpdated(Intent intent) {
+        enterMainActivity();
+    }
 }

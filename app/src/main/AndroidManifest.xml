@@ -137,7 +137,25 @@
         <activity
             android:name=".activities.JourneyActivity"
             android:label="@string/title_activity_journey"
-            android:theme="@style/MyMaterialTheme"></activity>
+            android:theme="@style/MyMaterialTheme" />
+
+        <service
+            android:name=".Geofencing.GeofenceTransitionsIntentService"
+            android:exported="false" />
+
+        <receiver
+            android:name=".BroadCastReceivers.DestinationReachedReceiver"
+            android:enabled="true"
+            android:exported="true" />
+
+        <service
+            android:name=".services.ContactListUpdateIntentService"
+            android:exported="false" />
+
+        <receiver
+            android:name=".BroadCastReceivers.ContactListUpdatedReceiver"
+            android:enabled="true"
+            android:exported="true"></receiver>
     </application>
 
 </manifest>
