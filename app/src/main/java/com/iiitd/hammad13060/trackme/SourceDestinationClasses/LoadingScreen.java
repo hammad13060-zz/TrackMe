@@ -28,7 +28,7 @@ import java.util.List;
 public class LoadingScreen extends AppCompatActivity {
 
     ProgressBar mProgessBar;
-    public static List<Contact> finalSelectedContactList = new ArrayList<>();
+    public static List<Parcelable> finalSelectedContactList = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

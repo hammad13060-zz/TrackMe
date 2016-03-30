@@ -1,13 +1,16 @@
 package com.iiitd.hammad13060.trackme.activities;
 
 import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -20,10 +23,15 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
+import com.iiitd.hammad13060.trackme.BroadCastReceivers.ContactListUpdatedReceiver;
+import com.iiitd.hammad13060.trackme.Interfaces.ContactListUpdatedInterface;
 import com.iiitd.hammad13060.trackme.R;
+import com.iiitd.hammad13060.trackme.cloudeMessaging.QuickstartPreferences;
+import com.iiitd.hammad13060.trackme.cloudeMessaging.RegistrationIntentService;
 import com.iiitd.hammad13060.trackme.helpers.Constants;
 import com.iiitd.hammad13060.trackme.helpers.JSONRequest;
 import com.iiitd.hammad13060.trackme.helpers.VolleyRequest;
+import com.iiitd.hammad13060.trackme.services.ContactListUpdateIntentService;
 import com.sinch.verification.Config;
 import com.sinch.verification.PhoneNumberUtils;
 import com.sinch.verification.SinchVerification;
@@ -33,10 +41,13 @@ import com.sinch.verification.VerificationListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class ProcessingActivity extends AppCompatActivity {
+public class ProcessingActivity extends AppCompatActivity implements ContactListUpdatedInterface {
     public static final String TAG = "ProcessingActivity";
     private static final String WEB_URL = Constants.SERVER_URL+ "registration/";
     TextView text_process;
+
+    private BroadcastReceiver gcmRegistrationReciever = null;
+    private BroadcastReceiver contactListUpdatedReceiver = null;
 
     private String contact_number = null;
     String phoneNumberInE164 = null;
@@ -46,7 +57,22 @@ public class ProcessingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_processing);
         Intent processingIntent = getIntent();
         contact_number = processingIntent.getStringExtra(Constants.EXTRA_CONTACT_NUMBER);
+        registerGCMReceiver();
         verifyUser();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerGCMReceiver();
+        registerContactListUpdatedReceiver();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unRegisterGCMReceiver();
+        unregisterContactListUpdatedReceiver();
     }
 
     private void verifyUser() {
@@ -164,8 +190,8 @@ public class ProcessingActivity extends AppCompatActivity {
                             editor.putString(Constants.PREFERENCE_TOKEN_FILE_TOKEN, token);
                             editor.commit();
                             ///////////////////////////////////
-
-                            enterWelcomeActivity();
+                            startGCMRegistrationService();
+                            //enterWelcomeActivity();
                         } else {
                             Constants.showLongToast(getApplicationContext(), "registration failed !!! Try again.");
                             enterRegistrationActivity();
@@ -185,6 +211,8 @@ public class ProcessingActivity extends AppCompatActivity {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     requestQueue.stop();
+                    Log.d(TAG, "cannot reach server for registration");
+                    Log.d(TAG, error.toString());
                     enterRegistrationActivity();
                 }
             };
@@ -204,4 +232,75 @@ public class ProcessingActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
+    private void startGCMRegistrationService() {
+        Intent intent = new Intent(this, RegistrationIntentService.class);
+        startService(intent);
+    }
+
+    private void registerGCMReceiver() {
+        if (gcmRegistrationReciever == null) {
+            initGCMReceiver();
+            LocalBroadcastManager.getInstance(this).registerReceiver(gcmRegistrationReciever,
+                    new IntentFilter(QuickstartPreferences.REGISTRATION_COMPLETE));
+        }
+    }
+
+    private void unRegisterGCMReceiver() {
+        if (gcmRegistrationReciever != null) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(gcmRegistrationReciever);
+        }
+    }
+
+    private void initGCMReceiver() {
+        gcmRegistrationReciever = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(Constants.PREFERENCE_TOKEN_FILE,
+                        Context.MODE_PRIVATE);
+                boolean sentToken = sharedPreferences
+                        .getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
+                if (sentToken) {
+                    fetchContacts();
+                    //enterWelcomeActivity();
+                } else {
+                    Constants.showLongToast(getApplicationContext(), "couldn't register for push notification service\n" +
+                            "Check your network connection");
+                    finish();
+                }
+            }
+        };
+    }
+
+    private void enterMainActivity(){
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void fetchContacts() {
+        Intent intent = new Intent(this, ContactListUpdateIntentService.class);
+        startService(intent);
+    }
+
+    private void registerContactListUpdatedReceiver() {
+        if (contactListUpdatedReceiver == null) {
+            contactListUpdatedReceiver = new ContactListUpdatedReceiver(this);
+            IntentFilter intent = new IntentFilter(ContactListUpdatedReceiver.CONTACT_LIST_UPDATED_RECEIVER_TAG);
+            LocalBroadcastManager.getInstance(this).registerReceiver(contactListUpdatedReceiver, intent);
+        }
+    }
+
+    private void unregisterContactListUpdatedReceiver() {
+        if (contactListUpdatedReceiver != null) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(contactListUpdatedReceiver);
+        }
+    }
+
+    @Override
+    public void onContactListUpdated(Intent intent) {
+        enterMainActivity();
+    }
+
+
 }

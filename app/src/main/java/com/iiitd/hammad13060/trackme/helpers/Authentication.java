@@ -20,4 +20,8 @@ public class Authentication {
         return true;
     }
 
+    public static void enterRegistrationActivity(Context context) {
+
+    }
+
 }

@@ -67,6 +67,7 @@ public class UsersDBHandler {
                 }
 
             } catch (SnappydbException e) {
+
                 e.printStackTrace();
             } catch (JSONException e) {
                 e.printStackTrace();

@@ -1,5 +1,6 @@
 package com.iiitd.hammad13060.trackme.helpers;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -119,14 +120,16 @@ public class Contact implements Parcelable {
     }
 
 
-/*
-* public int id;
-public String name;
-public List<String> phoneList;
-public String email;
-public String uriString;
-public boolean hasMobile;
-* */
+
+
+    /*
+    * public int id;
+    public String name;
+    public List<String> phoneList;
+    public String email;
+    public String uriString;
+    public boolean hasMobile;
+    * */
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
@@ -135,7 +138,6 @@ public boolean hasMobile;
         dest.writeList(phoneList);
         dest.writeString(email);
         dest.writeString(uriString);
-
     }
 
     public Contact(Parcel in) {

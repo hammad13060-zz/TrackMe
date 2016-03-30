@@ -57,7 +57,7 @@ public class ContactListUpdateService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG, "service started");
+        //Log.d(TAG, "service started");
         contactListRunnable = new UpdateAppUsersRunnable();
         contactListThread = new Thread(contactListRunnable);
         contactListThread.start();
@@ -112,7 +112,7 @@ public class ContactListUpdateService extends Service {
             try {
                 requestJson.put(Constants.JSON_CONTACTS, contacts);
 
-                Log.d(TAG, "sent: " + requestJson.toString());
+                //Log.d(TAG, "sent: " + requestJson.toString());
 
                 JSONRequest requestObject = new JSONRequest(Request.Method.POST, UPDATE_CONTACT_URL, null,
                         responseListener, errorListener, requestJson);
@@ -129,12 +129,12 @@ public class ContactListUpdateService extends Service {
 
                    UsersDBHandler usersDBHandler = new UsersDBHandler(getApplicationContext());
 
-                    Log.d(TAG, "received: " + response.toString());
+                    //Log.d(TAG, "received: " + response.toString());
 
                     usersDBHandler.addUsers(response);
 
                     List<Contact> phoneList = usersDBHandler.getAllData();
-                    Log.d(TAG, "data saved: " + phoneList.toString());
+                    //Log.d(TAG, "data saved: " + phoneList.toString());
 
                     requestState = true;
                 }

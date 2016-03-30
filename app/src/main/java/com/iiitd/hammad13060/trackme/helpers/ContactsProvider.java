@@ -82,17 +82,17 @@ public class ContactsProvider {
 
     private void getPhone(Cursor cursor, String contactId, Contact contact) {
         int hasPhoneNumber = Integer.parseInt(cursor.getString(cursor.getColumnIndex(HAS_PHONE_NUMBER)));
-        if (hasPhoneNumber > 0) {
+        if (hasPhoneNumber >= 0) {
             Cursor phoneCursor = contentResolver.query(PHONE_CONTENT_URI, null, PHONE_CONTACT_ID + " = ?", new String[]{contactId}, null);
             while (phoneCursor.moveToNext()) {
-                if (phoneCursor.getType(TYPE_MOBILE) == 0) {
+                //if (phoneCursor.getType(TYPE_MOBILE) == 0) {
                     String phoneNumber = prependCountryCode(phoneCursor.getString(phoneCursor.getColumnIndex(PHONE_NUMBER)));
                     if (phoneNumber != null) {
                         contact.hasMobile = true;
-                        Log.d(TAG, "Mobile number: " + phoneNumber);
+                        //Log.d(TAG, "Mobile number: " + phoneNumber);
                         contact.addMobile(phoneNumber);
                     }
-                }
+                //}
             }
             phoneCursor.close();
         }

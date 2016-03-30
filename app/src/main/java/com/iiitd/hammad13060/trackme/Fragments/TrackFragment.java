@@ -1,110 +1,153 @@
 package com.iiitd.hammad13060.trackme.Fragments;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
+import com.iiitd.hammad13060.trackme.JourneyListAdapter;
 import com.iiitd.hammad13060.trackme.R;
+import com.iiitd.hammad13060.trackme.dbHandler.JourneyDBHandler;
+import com.iiitd.hammad13060.trackme.entities.Journey;
+import com.iiitd.hammad13060.trackme.helpers.Contact;
+import com.iiitd.hammad13060.trackme.services.journeyServiceHelper.JourneyConstants;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link TrackFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link TrackFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.List;
+
+
 public class TrackFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    public View myView;
+    public ListView listView;
+    public List<Journey> journeyList;
+    public JourneyListAdapter journeyListAdapter;
 
-    private OnFragmentInteractionListener mListener;
-
-    public TrackFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment TrackFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static TrackFragment newInstance(String param1, String param2) {
-        TrackFragment fragment = new TrackFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
+    public BroadcastReceiver journeyCompletionBroadcast = null;
+    public BroadcastReceiver newJourneyBroadcast = null;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_track, container, false);
+        myView = inflater.inflate(R.layout.fragment_track, container, false);
+        return myView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        registerReceivers();
+
+        listView = (ListView)myView.findViewById(R.id.journey_list_view);
+        journeyList = getAllJourney();
+        journeyListAdapter = new JourneyListAdapter(getActivity(), journeyList);
+
+        listView.setAdapter(journeyListAdapter);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        registerReceivers();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        unregisterReceivers();
+    }
+
+    public void refreshList() {
+        journeyList = getAllJourney();
+        journeyListAdapter.setJourneyList(journeyList);
+        journeyListAdapter.notifyDataSetChanged();
+    }
+
+    //override this method in subclass
+    public List<Journey> getAllJourney() {
+        JourneyDBHandler dbHandler = new JourneyDBHandler(getActivity(), null, null, 1);
+        return dbHandler.getAllJourneys();
+    }
+
+    //override receivers registration and un registration
+    public void registerReceivers() {
+        registerJourneyCompletionBroadcast();
+        registerNewJourneyBroadcast();
+    }
+
+    public void unregisterReceivers() {
+        unregisterJourneyCompletionBroadcast();
+        unregisterNewJourneyBroadcast();
+    }
+
+
+    public void registerJourneyCompletionBroadcast() {
+        if (journeyCompletionBroadcast == null) {
+            initJourneyCompletionBroadcast();
+            IntentFilter filter = new IntentFilter(JourneyConstants.JOURNEY_COMPLETION_NOTIFIED);
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(journeyCompletionBroadcast, filter);
         }
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        /*if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }*/
+    public void unregisterJourneyCompletionBroadcast() {
+        if (journeyCompletionBroadcast != null)
+            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(journeyCompletionBroadcast);
+            journeyCompletionBroadcast = null;
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        //
-        // mListener = null;
+    public void registerNewJourneyBroadcast() {
+        if (newJourneyBroadcast == null) {
+            initNewJourneyBroadcast();
+            IntentFilter filter = new IntentFilter(JourneyConstants.NEW_JOURNEY_NOTIFIED);
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(newJourneyBroadcast, filter);
+        }
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+    public void unregisterNewJourneyBroadcast() {
+        if (newJourneyBroadcast != null)
+            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(newJourneyBroadcast);
+            newJourneyBroadcast = null;
+    }
+
+
+
+    public void initJourneyCompletionBroadcast() {
+        journeyCompletionBroadcast = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //refreshList();
+                reloadFragment();
+            }
+        };
+    }
+
+    public void initNewJourneyBroadcast() {
+        newJourneyBroadcast = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                //refreshList();
+                reloadFragment();
+            }
+        };
+    }
+
+
+    //resetting fragment
+    public void reloadFragment() {
+        android.support.v4.app.FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager.beginTransaction().detach(this).attach(this).commit();
     }
 }
