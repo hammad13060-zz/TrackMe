@@ -14,6 +14,7 @@ import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -355,17 +356,27 @@ public class JourneyFragment extends Fragment implements MyLocationInterface {
     }
 
     private void setJourneyDataOnUI() {
-        TextView view = (TextView)getView().findViewById(R.id.start_address_text);
-        view.setText(source_text);
+        //TextView view = (TextView)getView().findViewById(R.id.start_address_text);
+        Button bText = (Button)getView().findViewById(R.id.source_button);
+        source_text = "Source: " + source_text;
+        bText.setText(source_text);
+        //view.setText(source_text);
 
-        view = (TextView)getView().findViewById(R.id.end_address_text);
-        view.setText(destination_text);
+        //view = (TextView)getView().findViewById(R.id.end_address_text);
+        bText = (Button)getView().findViewById(R.id.destination_button);
+        destination_text = "Destination: "+ destination_text;
+        bText.setText(destination_text);
+        //view.setText(destination_text);
 
-        view = (TextView)getView().findViewById(R.id.distance_text);
-        view.setText(distance_text);
+        //TextView view = (TextView)findViewById(R.id.distance_text);
+        bText = (Button)getView().findViewById(R.id.durationAndTime);
+        //view.setText(distance_text);
+        distance_text = "Distance: " + distance_text + "\n";
+        //view = (TextView)findViewById(R.id.duration_text);
+        duration_text = distance_text + "Duration: " + duration_text;
+        bText.setText(duration_text);
 
-        view = (TextView)getView().findViewById(R.id.duration_text);
-        view.setText(duration_text);
+
     }
 
     /////////////////////////////////////registering journey finished receiver /////////////////////////////////

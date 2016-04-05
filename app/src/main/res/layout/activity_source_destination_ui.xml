@@ -193,12 +193,16 @@ tools:context="com.iiitd.hammad13060.trackme.SourceDestinationClasses.SourceDest
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true" />
 
-        <ListView
-            android:id="@+id/listViewContacts"
-            android:layout_below="@+id/contact_button"
-            android:layout_width="match_parent"
+            <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            />
+            android:text="No Contacts Selected"
+            android:id="@+id/cont"
+                android:textColor="@color/black"
+            android:paddingLeft="5dp"
+                android:layout_below="@+id/contact_button"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
         </RelativeLayout>
 
     </android.support.v7.widget.CardView>
@@ -207,22 +211,19 @@ tools:context="com.iiitd.hammad13060.trackme.SourceDestinationClasses.SourceDest
 
 
     <Button
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Start Journey"
         android:id="@+id/start_journey"
-        android:background="#3F51B5"
+        android:background="@color/colorPrimary"
         android:textColor="#FFFFFF"
         android:textSize="20sp"
-
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
 
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"/>
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 
     <!--Button

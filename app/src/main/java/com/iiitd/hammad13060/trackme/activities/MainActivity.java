@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements JourneyReadyInter
 
         adapter.addFragment(journeyFragment, "Journey");
         adapter.addFragment(trackFragment, "Track");
-        adapter.addFragment(archivedFragment, "Completed Journeys");
+        adapter.addFragment(archivedFragment, "HISTORY");
         viewPager.setAdapter(adapter);
     }
 

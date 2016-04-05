@@ -28,7 +28,7 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyA0w1WXH66tTgKQQLmErqek8jUP8JSo9Wk" />
-        <!-- android:value="AIzaSyBSRoUFUQb6Pfk1FbyVzNQ6qwc7I96pwQA" -->
+
 
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"

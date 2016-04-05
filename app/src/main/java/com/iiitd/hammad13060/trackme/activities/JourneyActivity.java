@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -71,6 +72,8 @@ public class JourneyActivity extends AppCompatActivity {
     private GoogleMap map;
 
     JSONObject directions;
+
+
 
     private String source_text;
     private String destination_text;
@@ -284,17 +287,24 @@ public class JourneyActivity extends AppCompatActivity {
     }
 
     private void setJourneyDataOnUI() {
-        TextView view = (TextView)findViewById(R.id.start_address_text);
-        view.setText(source_text);
+        //TextView view = (TextView)findViewById(R.id.start_address_text);
+        Button bText = (Button)findViewById(R.id.source_button);
+        source_text = "Source: " + source_text;
+        bText.setText(source_text);
 
-        view = (TextView)findViewById(R.id.end_address_text);
-        view.setText(destination_text);
+        //view = (TextView)findViewById(R.id.end_address_text);
+        bText = (Button)findViewById(R.id.destination_button);
+        destination_text = "Destination: "+ destination_text;
+        bText.setText(destination_text);
 
-        view = (TextView)findViewById(R.id.distance_text);
-        view.setText(distance_text);
 
-        view = (TextView)findViewById(R.id.duration_text);
-        view.setText(duration_text);
+        //TextView view = (TextView)findViewById(R.id.distance_text);
+        bText = (Button)findViewById(R.id.durationAndTime);
+        //view.setText(distance_text);
+        distance_text = "Distance: " + distance_text + "\n";
+        //view = (TextView)findViewById(R.id.duration_text);
+        duration_text = distance_text + "Duration: " + duration_text;
+        bText.setText(duration_text);
     }
 
 

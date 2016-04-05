@@ -13,7 +13,6 @@
         android:id="@+id/listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
         />
 
     <Button
@@ -23,7 +22,7 @@
         android:layout_alignParentBottom="true"
         android:text="Select Contact"
         android:onClick="onChecked"
-        android:background="#3F51B5"
+        android:background="@color/colorPrimary"
         android:textColor="#FFFFFF"
         android:textAllCaps="true"
         android:textStyle="bold"

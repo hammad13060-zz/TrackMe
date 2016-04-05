@@ -50,8 +50,11 @@ public class TrackFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         registerReceivers();
+         listView = (ListView)myView.findViewById(R.id.journey_list_view);
 
-        listView = (ListView)myView.findViewById(R.id.journey_list_view);
+        LayoutInflater inflater = getLayoutInflater(savedInstanceState);
+        View header = inflater.inflate(R.layout.header_trak_list, listView, false);
+        listView.addHeaderView(header, null, false);
         journeyList = getAllJourney();
         journeyListAdapter = new JourneyListAdapter(getActivity(), journeyList);
 

@@ -135,20 +135,6 @@ public class SourceDestinationUI extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
 
     @Override
@@ -182,18 +168,24 @@ public class SourceDestinationUI extends AppCompatActivity {
                         Log.d(TAG, "Selected Contacts are:  " + c.getName());
                 }
 
-                ListView listView = (ListView) findViewById(R.id.listViewContacts);
+
+                //ListView listView = (ListView) findViewById(R.id.listViewContacts);
+                TextView tview = (TextView)findViewById(R.id.cont);
+                String textContact = "Selected Contacts are:\n ";
                 int n = selectContact.size();
                 String[] conts = new String[n];
                 for(int i=0;i<n;i++)
                 {
                     Contact c = selectContact.get(i);
                     conts[i] = c.getName();
-                }
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                        android.R.layout.simple_list_item_1, conts);
+                    textContact = textContact + " "+(i+1) + ". "+conts[i] + "\n ";
 
-                listView.setAdapter(adapter);
+                }
+                tview.setText(textContact);
+                //ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                  //      android.R.layout.simple_list_item_1, conts);
+
+                //listView.setAdapter(adapter);
 
             }
             if (resultCode == Activity.RESULT_CANCELED) {
