@@ -70,6 +70,7 @@ public class TrackFragment extends Fragment {
         super.onResume();
         registerReceivers();
         headerView = (TextView)myView.findViewById(R.id.track_header);
+        setHeader();
     }
 
     @Override

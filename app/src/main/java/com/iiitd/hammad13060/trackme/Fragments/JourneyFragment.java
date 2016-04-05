@@ -22,6 +22,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.StreetViewPanorama;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -41,6 +42,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -93,6 +95,8 @@ public class JourneyFragment extends Fragment implements MyLocationInterface {
     private static View basic_view = null;
     private static View map_view = null;
 
+    private MapFragment mapFragment;
+
     public JourneyFragment() {
         // Required empty public constructor
     }
@@ -130,24 +134,27 @@ public class JourneyFragment extends Fragment implements MyLocationInterface {
         // Inflate the layout for this fragment
         try {
             View tmpView;
+            Log.d(TAG, "journey status: " + JourneyService.journeyRunning);
             if (JourneyService.journeyRunning){
+                Log.d(TAG, "setting map ui");
                 if (map_view == null)
                 {
                     map_view = inflater.inflate(R.layout.fragment_journey_map, container, false);
                     return map_view;
                 }
                 else {
-                    map_view.refreshDrawableState();
+                    //map_view.refreshDrawableState();
                     return map_view;
                 }
             }
             else {
+                Log.d(TAG, "setting no current journey ui");
                 if (basic_view == null) {
                     basic_view = inflater.inflate(R.layout.fragment_journey, container, false);
                     return basic_view;
                 }
                 else{
-                    basic_view.refreshDrawableState();
+                    //basic_view.refreshDrawableState();
                     return basic_view;
                 }
             }
@@ -243,30 +250,51 @@ public class JourneyFragment extends Fragment implements MyLocationInterface {
 
     public void setMap() {
 
-            initOnMapReadyCallback();
-            MapFragment mapFragment = (MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.map);
-            mapFragment.getMapAsync(onMapReadyCallback);
+            if (mapFragment == null) {
+                initOnMapReadyCallback();
+
+                mapFragment = (MapFragment) getActivity().getFragmentManager().findFragmentById(R.id.map);
+                if (mapFragment != null) {
+                    Log.d(TAG, "mapFragment not null");
+                    mapFragment.getMapAsync(onMapReadyCallback);
+                }
+                else {
+                    Log.d(TAG, "mapFragment is null");
+                    mapFragment = new MapFragment();
+                    getActivity().getFragmentManager()
+                            .beginTransaction()
+                            .add(R.id.map, mapFragment, "map").commit();
+                    mapFragment.getMapAsync(onMapReadyCallback);
+                }
+            } else {
+                mapFragment.getMapAsync(onMapReadyCallback);
+            }
     }
 
     private void initOnMapReadyCallback() {
 
-        onMapReadyCallback = new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(GoogleMap googleMap) {
-                mapReady = true;
-                map = googleMap;
-                map.clear();
-                //map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-                currentLocationMarker = googleMap.addMarker(
-                        new MarkerOptions()
-                                .position(new LatLng(JourneyService.getCurrentLat(), JourneyService.getCurrentLong()))
-                                                .title("Your current location.")
-                                );
-                Log.d(TAG, "directions json in callback :" + directions.toString());
+        if (onMapReadyCallback == null) {
 
-                plotDirections(googleMap, directions);
-            }
-        };
+            onMapReadyCallback = new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(GoogleMap googleMap) {
+                    mapReady = true;
+                    map = googleMap;
+                    map.clear();
+                    //map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                    currentLocationMarker = googleMap.addMarker(
+                            new MarkerOptions()
+                                    .position(new LatLng(JourneyService.getCurrentLat(), JourneyService.getCurrentLong()))
+                                    .title("Your current location.")
+                    );
+                    Log.d(TAG, "directions json in callback :" + directions.toString());
+
+                    plotDirections(googleMap, directions);
+                }
+
+
+            };
+        }
     }
 
     private void registerMyLocationReceiver() {
