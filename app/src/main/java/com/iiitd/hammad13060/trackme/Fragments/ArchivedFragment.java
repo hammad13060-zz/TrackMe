@@ -27,4 +27,9 @@ public class ArchivedFragment extends TrackFragment {
     public void unregisterReceivers() {
         unregisterJourneyCompletionBroadcast();
     }
+
+    @Override
+    public void setHeader() {
+        headerView.setText("History of journeys tracked");
+    }
 }

@@ -15,7 +15,8 @@
         android:text="List of People You Are Tracking"
         android:textAllCaps="true"
         android:textColor="@android:color/white"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:id="@+id/track_header"/>
 
 
 

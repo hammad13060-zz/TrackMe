@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.iiitd.hammad13060.trackme.JourneyListAdapter;
 import com.iiitd.hammad13060.trackme.R;
@@ -32,6 +33,9 @@ public class TrackFragment extends Fragment {
 
     public BroadcastReceiver journeyCompletionBroadcast = null;
     public BroadcastReceiver newJourneyBroadcast = null;
+
+    public TextView headerView = null;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +69,7 @@ public class TrackFragment extends Fragment {
     public void onResume() {
         super.onResume();
         registerReceivers();
+        headerView = (TextView)myView.findViewById(R.id.track_header);
     }
 
     @Override
@@ -153,4 +158,12 @@ public class TrackFragment extends Fragment {
         android.support.v4.app.FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         fragmentManager.beginTransaction().detach(this).attach(this).commit();
     }
+
+    //setting header text
+    public void setHeader() {
+        if (headerView != null) {
+            headerView.setText("List of People You Are Tracking");
+        }
+    }
+
 }
