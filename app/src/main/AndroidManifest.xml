@@ -27,7 +27,7 @@
         android:theme="@style/MyMaterialTheme">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyA0w1WXH66tTgKQQLmErqek8jUP8JSo9Wk" />
+            android:value="AIzaSyA_rs8zq47Tgsb2rfnFgI0OtaVopXjBRxU" />
 
 
         <receiver
