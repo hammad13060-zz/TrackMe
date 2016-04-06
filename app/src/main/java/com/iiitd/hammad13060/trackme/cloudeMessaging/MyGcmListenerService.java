@@ -124,12 +124,26 @@ public class MyGcmListenerService extends GcmListenerService {
             sendLocationUpdateBroadcast(data);
         } else if (update_type.equals(JourneyConstants.UPDATE_TYPE_TERMINATION)) {
 
+            String topic = data.getString(_JOURNEY_TOPIC);
+            String _from = data.getString(_FROM);
+            double current_lat = Double.parseDouble(data.getString(_CURRENT_LAT));
+            double current_long = Double.parseDouble(data.getString(_CURRENT_LONG));
+
+            Journey journey = new Journey(
+                    topic,
+                    _from,
+                    current_lat,
+                    current_long
+            );
+            Log.d("LocationUpdate: ", journey.toString());
+
             JourneyDBHandler dbHandler = new JourneyDBHandler(this, null, null, 1);
+            dbHandler.updateCurrentLocation(journey);
 
             //bug from
             //String _from = data.getString(_FROM);
             String _journey_topic = data.getString(_JOURNEY_TOPIC);
-            Journey journey = dbHandler.deleteJourney(_journey_topic);
+            journey = dbHandler.deleteJourney(_journey_topic);
 
             if (journey != null) {
 

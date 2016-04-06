@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_id": "trackme-3f469",
-    "project_number": "596257233359",
-    "name": "TrackMe"
+    "project_id": "independentprojectfollowme",
+    "project_number": "956849298267",
+    "name": "IndependentProjectFollowMe"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:596257233359:android:8f83d07f79ddd051",
+        "mobilesdk_app_id": "1:956849298267:android:8f83d07f79ddd051",
         "client_id": "android:com.iiitd.hammad13060.trackme",
         "client_type": 1,
         "android_client_info": {
