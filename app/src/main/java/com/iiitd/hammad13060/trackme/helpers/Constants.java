@@ -13,9 +13,9 @@ public class Constants {
     //public static final String SERVER_URL = "http://192.168.54.96:8080/";
    // public static final String SERVER_URL = "http://192.168.54.96:8080/";
     //public static final String SERVER_URL = "https://server-hammad13060-1.c9users.io:8080/";
-    public static final String SERVER_URL = "https://server-hammad13060.c9users.io:8080/";
+    //public static final String SERVER_URL = "https://server-hammad13060.c9users.io:8080/";
     //public static final String SERVER_URL = "http://192.168.0.11:8080/";
-   // public static final String SERVER_URL = "http://192.168.58.35:8080/";
+   public static final String SERVER_URL = "http://192.168.58.35:8080/";
     //public static final String SERVER_URL = "http://192.168.0.11:8080/";
 
     //public static final String SERVER_URL = "https://server-hammad13060.c9users.io:8080/";

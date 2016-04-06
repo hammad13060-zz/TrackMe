@@ -7,7 +7,9 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.InflateException;
@@ -413,6 +415,8 @@ public class JourneyFragment extends Fragment implements MyLocationInterface {
         journeyFinishedReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                FloatingActionButton floatingActionButton = (FloatingActionButton) getActivity().findViewById(R.id.fab);
+                floatingActionButton.setImageDrawable(ContextCompat.getDrawable(getActivity().getApplicationContext(), R.drawable.arrowroute));
                 reinitFragment();
             }
         };

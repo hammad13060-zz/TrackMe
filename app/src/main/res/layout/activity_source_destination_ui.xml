@@ -144,7 +144,7 @@ tools:context="com.iiitd.hammad13060.trackme.SourceDestinationClasses.SourceDest
             android:layout_height="35dp"
             android:layout_alignParentTop="true"
             android:scaleType="fitStart"
-            android:src="@drawable/destination"
+            android:src="@drawable/destination2"
             android:layout_gravity="left"/>
 
 

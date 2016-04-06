@@ -25,7 +25,7 @@ public class JourneyDBHandler extends SQLiteOpenHelper {
 
     private Context context = null;
 
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 10;
     private static final String DATABASE_NAME = "journey.db";
     private static final String TABLE_JOURNEY = "journeys";
 
