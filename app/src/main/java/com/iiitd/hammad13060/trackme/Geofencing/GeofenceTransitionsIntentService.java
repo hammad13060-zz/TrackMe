@@ -36,11 +36,11 @@ public class GeofenceTransitionsIntentService extends IntentService {
             return;
         }
 
-        try {
+        /*try {
             Thread.sleep(60000);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
 
         // Get the transition type.
         int geofenceTransition = geofencingEvent.getGeofenceTransition();

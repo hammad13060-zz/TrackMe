@@ -197,7 +197,7 @@ public class MyGcmListenerService extends GcmListenerService {
         Notification noti = new NotificationCompat.Builder(getApplicationContext())
                 .setContentTitle("You have a new journey to track")
                 .setContentText("New journey")
-                .setSmallIcon(R.drawable.destination)
+                .setSmallIcon(R.drawable.logofinal)
                 //.setLargeIcon(icon)
                 .build();
 
@@ -214,7 +214,7 @@ public class MyGcmListenerService extends GcmListenerService {
         Notification noti = new NotificationCompat.Builder(getApplicationContext())
                 .setContentTitle("A journey being tracked completed")
                 .setContentText("Destination Reached")
-                .setSmallIcon(R.drawable.destination)
+                .setSmallIcon(R.drawable.logofinal)
                 //.setLargeIcon(icon)
                 .build();
 

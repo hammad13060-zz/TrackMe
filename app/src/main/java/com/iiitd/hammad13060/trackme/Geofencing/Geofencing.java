@@ -67,11 +67,11 @@ public class Geofencing implements ResultCallback<Status> {
                 // Set the request ID of the geofence. This is a string to identify this
                 // geofence.
                 .setRequestId("destination")
-                .setExpirationDuration(3600*100)
+                .setExpirationDuration(3600*10000)
                 .setCircularRegion(
                         latitude,
                         longitude,
-                        22000
+                        100
                         //100 //geofence radius in meters
                 )
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)

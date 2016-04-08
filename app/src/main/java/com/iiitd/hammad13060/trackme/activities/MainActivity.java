@@ -126,6 +126,14 @@ public class MainActivity extends AppCompatActivity implements JourneyReadyInter
     protected void onResume() {
         super.onResume();
         registerJourneyReadyReciever();
+
+        if (JourneyService.journeyRunning) {
+            FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
+            floatingActionButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.stopjourney));
+        } else {
+            FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
+            floatingActionButton.setImageDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.arrowroute));
+        }
     }
 
     @Override

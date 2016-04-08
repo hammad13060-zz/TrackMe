@@ -1,5 +1,6 @@
 package com.iiitd.hammad13060.trackme.services;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Parcelable;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -27,6 +29,7 @@ import com.iiitd.hammad13060.trackme.BroadCastReceivers.JourneyReadyReceiver;
 import com.iiitd.hammad13060.trackme.Geofencing.Geofencing;
 import com.iiitd.hammad13060.trackme.Interfaces.DestinationReachedInterface;
 import com.iiitd.hammad13060.trackme.Interfaces.MyLocationInterface;
+import com.iiitd.hammad13060.trackme.R;
 import com.iiitd.hammad13060.trackme.activities.MainActivity;
 import com.iiitd.hammad13060.trackme.helpers.Authentication;
 import com.iiitd.hammad13060.trackme.helpers.Constants;
@@ -120,6 +123,8 @@ public class JourneyService extends Service implements MyLocationInterface, Goog
 
             initGoogleApiClient();
             mGoogleApiClient.connect();
+
+            makeForeground();
         }
 
 
@@ -137,6 +142,16 @@ public class JourneyService extends Service implements MyLocationInterface, Goog
         mGeofencing.stopGeofencing();
         mGoogleApiClient.disconnect();
         myLocation.tearDown();
+        stopForeground(true);
+    }
+
+    private void makeForeground() {
+        Notification noti = new NotificationCompat.Builder(getApplicationContext())
+                .setContentTitle("Your new journey setup is complete")
+                .setSmallIcon(R.drawable.logofinal)
+                        //.setLargeIcon(icon)
+                .build();
+        startForeground(123, noti);
     }
 
     @Override

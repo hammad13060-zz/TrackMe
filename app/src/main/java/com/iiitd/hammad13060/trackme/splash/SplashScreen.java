@@ -6,12 +6,14 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -37,6 +39,8 @@ public class SplashScreen extends AppCompatActivity implements ContactListUpdate
     private BroadcastReceiver gcmRegistrationReciever = null;
     private BroadcastReceiver contactListUpdatedReceiver = null;
 
+    private static final int SPLASH_DISPLAY_LENGTH = 2000;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,9 +53,14 @@ public class SplashScreen extends AppCompatActivity implements ContactListUpdate
                 enterRegistrationActivity();
                 //stopService(contactListUpdateServiceIntent); //stopping service contact List Update Service
             } else {
+                    if (hasGCMToken()) {
+                        waitOnSplash();
+                    } else {
+                        Intent intent = new Intent(this, RegistrationIntentService.class);
+                        startService(intent);
+                    }
                     //startService(contactListUpdateServiceIntent);
-                    Intent intent = new Intent(this, RegistrationIntentService.class);
-                    startService(intent);
+
             }
         } else {
             finish();
@@ -64,6 +73,8 @@ public class SplashScreen extends AppCompatActivity implements ContactListUpdate
         registerGCMReceiver();
         registerContactListUpdatedReceiver();
     }
+
+
 
     @Override
     protected void onPause() {
@@ -158,5 +169,22 @@ public class SplashScreen extends AppCompatActivity implements ContactListUpdate
     @Override
     public void onContactListUpdated(Intent intent) {
         enterMainActivity();
+    }
+
+    private boolean hasGCMToken() {
+        SharedPreferences preferences = getApplicationContext().getSharedPreferences(
+                Constants.PREFERENCE_TOKEN_FILE,
+                Context.MODE_PRIVATE
+        );
+        return preferences.getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
+    }
+
+    private void waitOnSplash() {
+        new Handler().postDelayed(new Runnable(){
+            @Override
+            public void run() {
+                enterMainActivity();
+            }
+        }, SPLASH_DISPLAY_LENGTH);
     }
 }
