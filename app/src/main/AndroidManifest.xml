@@ -22,7 +22,7 @@
     <application
         android:allowBackup="true"
         android:icon="@mipmap/logo"
-        android:label="@string/app_name"
+        android:label="FollowME"
         android:supportsRtl="true"
         android:theme="@style/MyMaterialTheme">
         <meta-data
@@ -58,7 +58,7 @@
 
         <activity
             android:name=".activities.MainActivity"
-            android:label="@string/app_name"
+            android:label="FollowME"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme.NoActionBar" >
 
@@ -104,10 +104,16 @@
         <activity android:name=".activities.TestActivity" />
 
 
-        <activity android:name=".SourceDestinationClasses.Source" />
+        <activity android:name=".SourceDestinationClasses.Source"
+            android:screenOrientation="portrait"/>
 
-        <activity android:name=".SourceDestinationClasses.SelectContacts" />
-        <activity android:name=".SourceDestinationClasses.MyDestination" />
+        <activity
+            android:name=".SourceDestinationClasses.SelectContacts"
+            android:screenOrientation="portrait" />
+        <activity
+                    android:name=".SourceDestinationClasses.MyDestination"
+                    android:screenOrientation="portrait"
+            />
 
         <service
             android:name=".services.JourneyService"
@@ -121,11 +127,14 @@
         </receiver>
 
 
-        <activity android:name=".SourceDestinationClasses.LoadingScreen" >
+        <activity android:name=".SourceDestinationClasses.LoadingScreen"
+            android:screenOrientation="portrait">
 
             </activity>
-        <activity android:name=".SourceDestinationClasses.SourceDestinationUI" />
-        <activity android:name=".SourceDestinationClasses.CurrentSource"></activity>
+        <activity android:name=".SourceDestinationClasses.SourceDestinationUI"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".SourceDestinationClasses.CurrentSource"
+            android:screenOrientation="portrait"></activity>
 
         <receiver
             android:name=".BroadCastReceivers.JourneyReadyReceiver"
@@ -139,6 +148,7 @@
         <activity
             android:name=".splash.SplashScreen"
             android:label="@string/title_activity_splash_screen"
+            android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -149,7 +159,8 @@
         <activity
             android:name=".activities.JourneyActivity"
             android:label="@string/title_activity_journey"
-            android:theme="@style/MyMaterialTheme" />
+            android:theme="@style/MyMaterialTheme"
+            android:screenOrientation="portrait"/>
 
         <service
             android:name=".Geofencing.GeofenceTransitionsIntentService"

@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements JourneyReadyInter
 
     ViewPagerAdapter adapter;
 
-    private DialogFragment stopJourneyDialog;
+    private DialogFragment stopJourneyDialog = new DialogFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements JourneyReadyInter
                     startActivityForResult(i, SELECT_SOURCE_DESTINATION_REQUEST_CODE);
                 } else {
                     createStopJourneyDialog();
-                    stopJourneyDialog.show(getSupportFragmentManager(), "dialog_for_force_stopping_current_journey");
+                    //stopJourneyDialog.show(getSupportFragmentManager(), "dialog_for_force_stopping_current_journey");
                 }
 
             }
@@ -279,12 +279,10 @@ public class MainActivity extends AppCompatActivity implements JourneyReadyInter
         return p;
     }
 
-    private void createStopJourneyDialog() {
-        stopJourneyDialog = new DialogFragment(){
-            @Override
-            public Dialog onCreateDialog(Bundle savedInstanceState) {
+   private void createStopJourneyDialog() {
+
                 // Use the Builder class for convenient dialog construction
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setMessage("Do you want to stop your current journey")
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
@@ -298,9 +296,7 @@ public class MainActivity extends AppCompatActivity implements JourneyReadyInter
                                 // User cancelled the dialog
                             }
                         });
-                // Create the AlertDialog object and return it
-                return builder.create();
-            }
-        };
+                builder.show();
+
     }
 }
