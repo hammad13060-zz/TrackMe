@@ -46,20 +46,17 @@ public class SplashScreen extends AppCompatActivity implements ContactListUpdate
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
 
-        //Intent contactListUpdateServiceIntent = new Intent(getApplicationContext(), ContactListUpdateService.class);
+        Intent contactListUpdateServiceIntent = new Intent(getApplicationContext(),
+                ContactListUpdateIntentService.class);
 
         if (checkPlayServices()) {
             if (!Authentication.hasAccess(getApplicationContext())) {
                 enterRegistrationActivity();
                 //stopService(contactListUpdateServiceIntent); //stopping service contact List Update Service
             } else {
-                    if (hasGCMToken()) {
-                        waitOnSplash();
-                    } else {
-                        Intent intent = new Intent(this, RegistrationIntentService.class);
-                        startService(intent);
-                    }
-                    //startService(contactListUpdateServiceIntent);
+                Intent intent = new Intent(this, RegistrationIntentService.class);
+                startService(intent);
+                startService(contactListUpdateServiceIntent);
 
             }
         } else {
