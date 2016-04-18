@@ -46,17 +46,19 @@ public class SplashScreen extends AppCompatActivity implements ContactListUpdate
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
 
-        Intent contactListUpdateServiceIntent = new Intent(getApplicationContext(),
-                ContactListUpdateIntentService.class);
-
         if (checkPlayServices()) {
             if (!Authentication.hasAccess(getApplicationContext())) {
                 enterRegistrationActivity();
                 //stopService(contactListUpdateServiceIntent); //stopping service contact List Update Service
             } else {
-                Intent intent = new Intent(this, RegistrationIntentService.class);
-                startService(intent);
-                startService(contactListUpdateServiceIntent);
+                if (hasGCMToken()) {
+                    waitOnSplash();
+                } else {
+                    Intent intent = new Intent(this, RegistrationIntentService.class);
+                    startService(intent);
+                }
+
+                fetchContacts();
 
             }
         } else {
@@ -127,8 +129,8 @@ public class SplashScreen extends AppCompatActivity implements ContactListUpdate
                 boolean sentToken = sharedPreferences
                         .getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
                 if (sentToken) {
-                    //enterMainActivity();
-                    fetchContacts();
+                    enterMainActivity();
+                    //fetchContacts();
                 } else {
                     Constants.showLongToast(getApplicationContext(), "couldn't register for push notification service\n" +
                             "Check your network connection");
@@ -165,7 +167,7 @@ public class SplashScreen extends AppCompatActivity implements ContactListUpdate
 
     @Override
     public void onContactListUpdated(Intent intent) {
-        enterMainActivity();
+        //enterMainActivity();
     }
 
     private boolean hasGCMToken() {

@@ -26,6 +26,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.StreetViewPanorama;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -69,6 +70,8 @@ public class JourneyActivity extends AppCompatActivity {
 
     private boolean mapReady = false;
     private Marker currentLocationMarker;
+    private Marker sourceLocationMarker;
+    private Marker destinationLocationMarker;
     private GoogleMap map;
 
     JSONObject directions;
@@ -139,7 +142,24 @@ public class JourneyActivity extends AppCompatActivity {
                         new MarkerOptions()
                                 .position(new LatLng(current_lat, current_long))
                                 .title("Your current location.")
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
                 );
+
+                sourceLocationMarker = googleMap.addMarker(
+                        new MarkerOptions()
+                                .position(new LatLng(src_lat, src_long))
+                                .title("Source.")
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                );
+
+                destinationLocationMarker = googleMap.addMarker(
+                        new MarkerOptions()
+                                .position(new LatLng(dst_lat, dst_long))
+                                .title("Destination.")
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                );
+
+
                 //Log.d(TAG, "directions json in callback :" + directions.toString());
                 fetchDirections();
 

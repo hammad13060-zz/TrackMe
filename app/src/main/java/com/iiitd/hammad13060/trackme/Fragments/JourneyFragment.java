@@ -25,6 +25,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.StreetViewPanorama;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -76,7 +77,11 @@ public class JourneyFragment extends Fragment implements MyLocationInterface {
 
 
     private OnMapReadyCallback onMapReadyCallback = null;
+
     private BroadcastReceiver currentLocationReceiver = null;
+    private Marker destinationLocationMarker = null;
+    private Marker sourceLocationMarker = null;
+
     private BroadcastReceiver journeyReadyReciever = null;
     private BroadcastReceiver journeyFinishedReceiver = null;
     private boolean mapReady = false;
@@ -288,6 +293,21 @@ public class JourneyFragment extends Fragment implements MyLocationInterface {
                             new MarkerOptions()
                                     .position(new LatLng(JourneyService.getCurrentLat(), JourneyService.getCurrentLong()))
                                     .title("Your current location.")
+                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                    );
+
+                    sourceLocationMarker = googleMap.addMarker(
+                            new MarkerOptions()
+                                    .position(new LatLng(JourneyService.getSrctLat(), JourneyService.getSrcLong()))
+                                    .title("Source.")
+                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                    );
+
+                    destinationLocationMarker = googleMap.addMarker(
+                            new MarkerOptions()
+                                    .position(new LatLng(JourneyService.getDestLat(), JourneyService.getDestLong()))
+                                    .title("Destination.")
+                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
                     );
                     Log.d(TAG, "directions json in callback :" + directions.toString());
 
