@@ -89,7 +89,7 @@ public class JourneyActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_journey_map);
+        setContentView(R.layout.activity_journey);
     }
 
     @Override
