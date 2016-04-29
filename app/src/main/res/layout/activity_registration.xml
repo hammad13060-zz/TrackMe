@@ -59,7 +59,7 @@
             android:layout_marginTop="47dp"
             android:layout_marginLeft="30dp"
             android:onClick="onRegister"
-            android:background="#3F51B5"
+            android:background="@color/colorPrimary"
             android:textColor="#FFFFFF"
             android:textSize="20dp" />
 

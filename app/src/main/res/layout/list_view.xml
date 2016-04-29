@@ -7,26 +7,6 @@
         android:weightSum="1">
 
 
-    <!--TextView
-        android:id="@+id/name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-
-        android:text="TextView" />
-
-    <CheckBox
-        android:id="@+id/chk_box"
-        android:layout_width="wrap_content"
-        android:layout_height="49dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignBaseline="@+id/name"
-        android:layout_alignBottom="@+id/name"
-        android:layout_toRightOf="@+id/name"
-        android:focusable="false"
-        android:focusableInTouchMode="false"
-        android:layout_weight="0.07"
-        android:checked="false" /!-->
         <CheckBox
             android:id="@+id/chk_box"
             android:layout_width="wrap_content"

@@ -128,13 +128,6 @@ public class SourceDestinationUI extends AppCompatActivity {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
 
 
     @Override
@@ -190,7 +183,7 @@ public class SourceDestinationUI extends AppCompatActivity {
             }
             if (resultCode == Activity.RESULT_CANCELED) {
                 Log.d(TAG, "CANCEELED............");
-                finish();
+                //finish();
             }
 
         }
